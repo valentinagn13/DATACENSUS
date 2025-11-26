@@ -1,56 +1,87 @@
-import { useState } from "react";
-import { DatasetInput } from "@/components/DataCensus/DatasetInput";
+import { useState, useEffect } from "react";
 import { MetricsDisplay } from "@/components/DataCensus/MetricsDisplay";
-import { evaluarCalidadDataset } from "@/lib/quality/dataQuality";
-import { AnalysisState } from "@/types/dataQuality";
+import { QualityResults } from "@/types/dataQuality";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
-const Index = () => {
-  const [state, setState] = useState<AnalysisState>({
-    loading: false,
-    error: null,
-    results: null,
-    dataset: null,
-    url: ""
-  });
+const API_BASE_URL = "http://localhost:8000";
 
-  const handleAnalyze = async (url: string) => {
-    setState({ ...state, loading: true, error: null, url });
+const CRITERIA_ENDPOINTS = [
+  "confidencialidad",
+  "relevancia",
+  "actualidad",
+  "trazabilidad",
+  "conformidad",
+  "exactitudSintactica",
+  "exactitudSemantica",
+  "completitud",
+  "consistencia",
+  "precision",
+  "portabilidad",
+  "credibilidad",
+  "comprensibilidad",
+  "accesibilidad",
+  "unicidad",
+  "eficiencia",
+  "recuperabilidad",
+  "disponibilidad"
+];
+
+const Index = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [results, setResults] = useState<QualityResults | null>(null);
+
+  const fetchAllMetrics = async () => {
+    setLoading(true);
+    setError(null);
     
-    toast.info("Iniciando análisis del dataset...", {
-      description: "Descargando y evaluando datos"
+    toast.info("Obteniendo métricas de calidad...", {
+      description: "Consultando 18 criterios desde el servidor"
     });
 
     try {
-      const results = await evaluarCalidadDataset(url);
-      
-      setState({
-        loading: false,
-        error: null,
-        results,
-        dataset: null,
-        url
+      const promises = CRITERIA_ENDPOINTS.map(async (criterion) => {
+        const response = await fetch(`${API_BASE_URL}/${criterion}`);
+        if (!response.ok) {
+          throw new Error(`Error al obtener ${criterion}: ${response.statusText}`);
+        }
+        const data = await response.json();
+        return { criterion, value: data.value || data.score || 0 };
       });
 
-      toast.success("Análisis completado", {
-        description: `Calidad general: ${results.promedioGeneral.toFixed(1)}/10`
+      const metricsArray = await Promise.all(promises);
+      
+      const metricsObj: any = {};
+      metricsArray.forEach(({ criterion, value }) => {
+        metricsObj[criterion] = value;
+      });
+
+      const promedio = metricsArray.reduce((sum, m) => sum + m.value, 0) / metricsArray.length;
+      metricsObj.promedioGeneral = promedio;
+
+      setResults(metricsObj as QualityResults);
+      setLoading(false);
+
+      toast.success("Métricas obtenidas exitosamente", {
+        description: `Calidad general: ${promedio.toFixed(1)}/10`
       });
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Error desconocido";
-      setState({
-        ...state,
-        loading: false,
-        error: errorMessage
-      });
+      const errorMessage = error instanceof Error ? error.message : "Error al conectar con el servidor";
+      setError(errorMessage);
+      setLoading(false);
       
-      toast.error("Error en el análisis", {
+      toast.error("Error al obtener métricas", {
         description: errorMessage
       });
     }
   };
+
+  useEffect(() => {
+    fetchAllMetrics();
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -75,12 +106,9 @@ const Index = () => {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8 space-y-8">
-        {/* Input Section */}
-        <DatasetInput onAnalyze={handleAnalyze} loading={state.loading} />
-
         {/* Loading State */}
         <AnimatePresence mode="wait">
-          {state.loading && (
+          {loading && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -102,7 +130,7 @@ const Index = () => {
 
         {/* Error State */}
         <AnimatePresence mode="wait">
-          {state.error && !state.loading && (
+          {error && !loading && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -110,8 +138,8 @@ const Index = () => {
             >
               <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
-                <AlertTitle>Error en el análisis</AlertTitle>
-                <AlertDescription>{state.error}</AlertDescription>
+                <AlertTitle>Error al obtener métricas</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
               </Alert>
             </motion.div>
           )}
@@ -119,19 +147,19 @@ const Index = () => {
 
         {/* Results */}
         <AnimatePresence mode="wait">
-          {state.results && !state.loading && (
+          {results && !loading && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             >
-              <MetricsDisplay results={state.results} />
+              <MetricsDisplay results={results} />
             </motion.div>
           )}
         </AnimatePresence>
 
         {/* Welcome State */}
-        {!state.results && !state.loading && !state.error && (
+        {!results && !loading && !error && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -144,8 +172,8 @@ const Index = () => {
               Bienvenido a DataCensus
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Evalúa la calidad de tus datasets con 17 criterios especializados basados en
-              estándares internacionales. Ingresa una URL de dataset JSON para comenzar el análisis.
+              Visualiza métricas de calidad de datos en tiempo real desde tu servidor local.
+              Las métricas se actualizan automáticamente al cargar la página.
             </p>
             <div className="flex flex-wrap gap-3 justify-center pt-4">
               <div className="px-4 py-2 bg-card border border-border rounded-lg">
