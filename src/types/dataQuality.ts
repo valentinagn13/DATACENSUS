@@ -32,11 +32,3 @@ export interface DatasetMetadata {
   vinculo?: string;
   columnasDescripciones?: Record<string, string>;
 }
-
-export interface AnalysisState {
-  loading: boolean;
-  error: string | null;
-  results: QualityResults | null;
-  dataset: any[] | null;
-  url: string;
-}

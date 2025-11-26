@@ -1,12 +1,15 @@
 import { QualityResults } from "@/types/dataQuality";
 import { CriterionCard } from "./CriterionCard";
 import { ScoreGauge } from "./ScoreGauge";
+import { Button } from "@/components/ui/button";
+import { generatePDFReport } from "@/lib/quality/exportPDF";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
 import {
   Shield, TrendingUp, Clock, FileSearch, CheckCircle2, 
   FileText, Target, BarChart3, Layers, Zap, 
   Package, Award, BookOpen, Eye, Fingerprint,
-  Activity, RotateCcw, Wifi, Database
+  Activity, RotateCcw, Wifi, Database, Download
 } from "lucide-react";
 
 interface MetricsDisplayProps {
@@ -35,6 +38,17 @@ const criteriaConfig = [
 ];
 
 export const MetricsDisplay = ({ results }: MetricsDisplayProps) => {
+  const handleDownloadPDF = async () => {
+    toast.info("Generando reporte PDF...");
+    try {
+      await generatePDFReport(results);
+      toast.success("Reporte descargado exitosamente");
+    } catch (error) {
+      toast.error("Error al generar el PDF");
+      console.error(error);
+    }
+  };
+
   return (
     <div className="w-full max-w-7xl mx-auto space-y-8">
       {/* Overall Score */}
@@ -43,6 +57,16 @@ export const MetricsDisplay = ({ results }: MetricsDisplayProps) => {
         animate={{ opacity: 1, scale: 1 }}
         className="bg-gradient-to-br from-card via-card to-primary/5 border border-primary/20 rounded-xl p-8 shadow-xl"
       >
+        <div className="flex justify-end mb-4">
+          <Button 
+            onClick={handleDownloadPDF}
+            variant="outline"
+            className="gap-2"
+          >
+            <Download className="w-4 h-4" />
+            Descargar PDF
+          </Button>
+        </div>
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex-1 text-center md:text-left">
             <div className="flex items-center gap-2 justify-center md:justify-start mb-2">
