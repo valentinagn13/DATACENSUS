@@ -56,7 +56,7 @@ export const Header = ({
                       onDatasetSubmit && onDatasetSubmit();
                     }
                   }}
-                  className="flex-1 h-10 bg-[#FFFFFF] text-white placeholder-[#FFFFFF] border-2 border-white/30 rounded-lg focus:ring-4 focus:ring-white/20 transition-colors shadow-lg"
+                  className="flex-1 h-10 bg-[#FFFFFF] text-black placeholder-[#000000] border-2 border-white/30 rounded-lg focus:ring-4 focus:ring-white/20 transition-colors shadow-lg"
                 />
                 <p className="text-xs text-gray-800/80">
                   Encuentra IDs en <strong>datos.gov.co</strong>

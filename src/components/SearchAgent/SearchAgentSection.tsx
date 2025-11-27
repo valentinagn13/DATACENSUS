@@ -57,13 +57,13 @@ export const SearchAgentSection = () => {
             <div className="flex flex-col gap-4">
               <div className="flex gap-3">
                 <div className="flex-1 relative">
-                  <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                  <Search className="absolute left-3 top-3 w-5 h-5 text-black-400" />
                   <Input
                     placeholder="¿Qué dataset estás buscando? Describe tus necesidades..."
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-                    className="pl-10 h-12 border-0 bg-gray-50/50 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:bg-white text-base transition-colors"
+                    className="pl-10 h-12 border-0 bg-gray-50/50 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:bg-white text-base transition-colors text-black caret-black"
                     disabled={isLoading}
                   />
                 </div>
