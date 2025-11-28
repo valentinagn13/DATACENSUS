@@ -174,6 +174,16 @@ export const MetricsDisplay = ({
             delay={0.2}
           />
 
+          {/* Conformidad */}
+          <CriterionCard
+            title="Conformidad"
+            value={results.conformidad}
+            description="Alineación con el esquema y reglas del dataset"
+            tooltipContent="Evalúa la correspondencia entre los datos y la metadata/estructura esperada"
+            color="blue"
+            delay={0.25}
+          />
+
           {/* Unicidad */}
           <CriterionCard
             title="Unicidad"
@@ -182,6 +192,16 @@ export const MetricsDisplay = ({
             tooltipContent="Evalúa la presencia de registros duplicados y valores únicos por columna"
             color="red"
             delay={0.3}
+          />
+
+          {/* Accesibilidad */}
+          <CriterionCard
+            title="Accesibilidad"
+            value={results.accesibilidad}
+            description="Disponibilidad y facilidad de acceso a los datos"
+            tooltipContent="Evalúa si los datos son accesibles, recuperables y están correctamente documentados para su uso"
+            color="blue"
+            delay={0.35}
           />
 
           {/* Completitud - Show loading skeleton if undefined */}
@@ -219,7 +239,6 @@ export const MetricsDisplay = ({
           {[
             { title: "Consistencia", icon: "✓" },
             { title: "Exactitud", icon: "🎯" },
-            { title: "Conformidad", icon: "📐" },
           ].map((metric, idx) => (
             <Card
               key={idx}

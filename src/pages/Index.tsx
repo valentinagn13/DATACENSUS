@@ -15,6 +15,8 @@ const API_BASE_URL = "http://localhost:8001";
 const CRITERIA_ENDPOINTS = [
   "actualidad",
   "confidencialidad",
+  "accesibilidad",
+  "conformidad",
   "completitud",
   "unicidad"
 ];
@@ -141,8 +143,8 @@ const Index = () => {
   };
 
   const fetchFastMetrics = async () => {
-    // Fetch actualidad, confidencialidad, and unicidad (fast endpoints)
-    const fastEndpoints = ["actualidad", "confidencialidad", "unicidad"];
+    // Fetch actualidad, confidencialidad, unicidad, accesibilidad and conformidad (fast endpoints)
+    const fastEndpoints = ["actualidad", "confidencialidad", "unicidad", "accesibilidad", "conformidad"];
     try {
       const promises = fastEndpoints.map(async (criterion) => {
         const response = await fetch(`${API_BASE_URL}/${criterion}?dataset_id=${datasetInput}`);
@@ -224,6 +226,8 @@ const Index = () => {
               updated.actualidad,
               updated.confidencialidad,
               updated.unicidad,
+              updated.accesibilidad,
+              updated.conformidad,
               updated.completitud
             ].filter((m) => m !== undefined && m !== null);
             updated.promedioGeneral = metrics.length > 0 ? metrics.reduce((s, m) => s + m, 0) / metrics.length : 0;
