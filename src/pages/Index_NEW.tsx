@@ -180,7 +180,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white">
-      <Header currentSection={currentSection} onSectionChange={setCurrentSection} datasetId={datasetInput} onDatasetIdChange={setDatasetInput} />
+      <Header currentSection={currentSection} onSectionChange={setCurrentSection} />
 
       <main className="pt-24 pb-20 px-4 md:px-6 max-w-7xl mx-auto">
         <AnimatePresence mode="wait">

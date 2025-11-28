@@ -1,4 +1,4 @@
-import { Database, BarChart3, Search, TrendingUp } from "lucide-react";
+import { BarChart3, Search, TrendingUp } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface HeaderProps {
@@ -17,24 +17,11 @@ export const Header = ({
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+    <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-white/20">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between py-4">
-          {/* Logo y Brand */}
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 bg-gradient-to-br from-[#2962FF] to-[#1E4ED8] p-2.5 rounded-lg">
-              <Database className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-gray-900">
-                DataCensus
-              </h1>
-              <p className="text-xs font-medium text-gray-600">MinTIC Analytics</p>
-            </div>
-          </div>
-
-          {/* Navegación */}
-          <nav className="hidden md:flex items-center gap-2">
+        <div className="flex items-center justify-center py-4">
+          {/* Navegación Centrada - Minimalista */}
+          <nav className="flex items-center gap-8">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = currentSection === item.id;
@@ -42,18 +29,30 @@ export const Header = ({
                 <button
                   key={item.id}
                   onClick={() => onSectionChange(item.id)}
-                  className={`relative px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 flex items-center gap-2 ${
-                    isActive
-                      ? "bg-[#2962FF] text-white shadow-lg shadow-blue-500/20"
-                      : "text-gray-700 hover:bg-gray-100"
-                  }`}
+                  className="relative px-4 py-3 font-medium text-sm transition-all duration-200 flex items-center gap-3 group"
                 >
-                  <Icon className="w-4 h-4" />
-                  {item.label}
+                  <div className={`p-2 rounded-lg transition-all duration-200 ${
+                    isActive 
+                      ? "bg-gradient-to-br from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/25" 
+                      : "bg-white/50 text-gray-600 group-hover:bg-white group-hover:text-gray-900 group-hover:shadow-md"
+                  }`}>
+                    <Icon className="w-4 h-4" />
+                  </div>
+                  <span className={`font-semibold transition-colors ${
+                    isActive 
+                      ? "text-white bg-gradient-to-r from-cyan-500 to-blue-600 bg-clip-text text-transparent" 
+                      : "text-gray-600 group-hover:text-gray-900"
+                  }`}>
+                    {item.label}
+                  </span>
+                  
+                  {/* Línea inferior solo en activo */}
                   {isActive && (
                     <motion.div
-                      layoutId="activeSection"
-                      className="absolute inset-0 bg-[#2962FF] rounded-lg -z-10"
+                      layoutId="activeIndicator"
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
                       transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                     />
                   )}
@@ -61,28 +60,6 @@ export const Header = ({
               );
             })}
           </nav>
-
-          {/* Navegación Mobile */}
-          <div className="md:hidden flex gap-1">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = currentSection === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => onSectionChange(item.id)}
-                  className={`p-2 rounded-lg transition-all duration-200 ${
-                    isActive
-                      ? "bg-[#2962FF] text-white"
-                      : "text-gray-700 hover:bg-gray-100"
-                  }`}
-                  aria-label={item.label}
-                >
-                  <Icon className="w-5 h-5" />
-                </button>
-              );
-            })}
-          </div>
         </div>
       </div>
     </header>

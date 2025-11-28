@@ -3,7 +3,7 @@ import { MetricsDisplay } from "@/components/DataCensus/MetricsDisplay";
 import { QualityResults } from "@/types/dataQuality";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
-import { AlertCircle, Loader2, CheckCircle2, Database } from "lucide-react";
+import { AlertCircle, Loader2, CheckCircle2, Database, Search, Sparkles } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent } from "@/components/ui/card";
 import { Header } from "@/components/Header/Header";
@@ -20,6 +20,136 @@ const CRITERIA_ENDPOINTS = [
   "completitud",
   "unicidad"
 ];
+
+// Componente para el fondo de red neuronal
+const NeuralNetworkBackground = () => {
+  return (
+    <div className="fixed inset-0 -z-10 overflow-hidden">
+      {/* Gradient Background */}
+      <div className="absolute inset-0 bg-gradient-to-b from-cyan-500 via-blue-700 to-slate-900"></div>
+      
+      {/* Neural Network Grid */}
+      <svg
+        className="absolute inset-0 w-full h-full opacity-20"
+        viewBox="0 0 100 100"
+        preserveAspectRatio="none"
+      >
+        {/* Grid Points */}
+        {Array.from({ length: 200 }, (_, i) => {
+          const x = Math.random() * 100;
+          const y = Math.random() * 100;
+          const size = Math.random() * 0.3 + 0.1;
+          const opacity = Math.random() * 0.6 + 0.2;
+          
+          return (
+            <circle
+              key={`point-${i}`}
+              cx={x}
+              cy={y}
+              r={size}
+              fill="white"
+              opacity={opacity}
+            >
+              <animate
+                attributeName="opacity"
+                values={`${opacity};${opacity * 0.3};${opacity}`}
+                dur={`${Math.random() * 5 + 3}s`}
+                repeatCount="indefinite"
+              />
+            </circle>
+          );
+        })}
+        
+        {/* Connecting Lines */}
+        {Array.from({ length: 150 }, (_, i) => {
+          const x1 = Math.random() * 100;
+          const y1 = Math.random() * 100;
+          const x2 = x1 + (Math.random() - 0.5) * 20;
+          const y2 = y1 + (Math.random() - 0.5) * 20;
+          const opacity = Math.random() * 0.3 + 0.1;
+          
+          if (x2 < 0 || x2 > 100 || y2 < 0 || y2 > 100) return null;
+          
+          return (
+            <line
+              key={`line-${i}`}
+              x1={x1}
+              y1={y1}
+              x2={x2}
+              y2={y2}
+              stroke="white"
+              strokeWidth="0.1"
+              opacity={opacity}
+            >
+              <animate
+                attributeName="stroke-width"
+                values="0.1;0.3;0.1"
+                dur={`${Math.random() * 8 + 4}s`}
+                repeatCount="indefinite"
+              />
+            </line>
+          );
+        })}
+        
+        {/* Animated Data Flow Lines */}
+        {Array.from({ length: 30 }, (_, i) => {
+          const startX = Math.random() * 100;
+          const startY = Math.random() * 100;
+          const length = Math.random() * 15 + 5;
+          const angle = Math.random() * 360;
+          const endX = startX + length * Math.cos((angle * Math.PI) / 180);
+          const endY = startY + length * Math.sin((angle * Math.PI) / 180);
+          
+          return (
+            <line
+              key={`flow-${i}`}
+              x1={startX}
+              y1={startY}
+              x2={endX}
+              y2={endY}
+              stroke="url(#pulseGradient)"
+              strokeWidth="0.15"
+              opacity="0.4"
+            >
+              <animate
+                attributeName="opacity"
+                values="0;0.6;0"
+                dur={`${Math.random() * 3 + 2}s`}
+                repeatCount="indefinite"
+                begin={`${Math.random() * 2}s`}
+              />
+            </line>
+          );
+        })}
+        
+        {/* Gradient for animated lines */}
+        <defs>
+          <linearGradient id="pulseGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#00FFFF" stopOpacity="1">
+              <animate
+                attributeName="stop-color"
+                values="#00FFFF; #0077FF; #00FFFF"
+                dur="2s"
+                repeatCount="indefinite"
+              />
+            </stop>
+            <stop offset="100%" stopColor="#0077FF" stopOpacity="1">
+              <animate
+                attributeName="stop-color"
+                values="#0077FF; #00FFFF; #0077FF"
+                dur="2s"
+                repeatCount="indefinite"
+              />
+            </stop>
+          </linearGradient>
+        </defs>
+      </svg>
+      
+      {/* Overlay para mejorar legibilidad */}
+      <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/10 via-blue-700/5 to-slate-900/20"></div>
+    </div>
+  );
+};
 
 const Index = () => {
   const [currentSection, setCurrentSection] = useState<"metrics" | "search" | "global">("metrics");
@@ -284,205 +414,283 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white">
-      <Header currentSection={currentSection} onSectionChange={setCurrentSection} />
+    <div className="min-h-screen relative">
+      {/* Fondo de red neuronal */}
+      <NeuralNetworkBackground />
+      
+      {/* Contenido principal */}
+      <div className="relative z-10">
+        <Header currentSection={currentSection} onSectionChange={setCurrentSection} />
 
-      <main className="pt-6 pb-20 px-4 md:px-6 max-w-7xl mx-auto">
-        <AnimatePresence mode="wait">
-          {/* SECCIÓN 1: ANÁLISIS POR ID */}
-          {currentSection === "metrics" && (
-            <motion.div
-              key="metrics-section"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.4 }}
-              className="space-y-8"
-            >
-              {/* Header de Sección */}
-              <div className="mb-8">
-                <h1 className="text-4xl font-bold text-gray-900 mb-2">
-                  Análisis de Calidad por ID
-                </h1>
-                <p className="text-lg text-gray-600">
-                  Ingresa el ID de un dataset para evaluar su calidad usando estándares ISO/IEC 25012
-                </p>
-              </div>
-
-              {/* Input Section - Diseño Moderno */}
+        <main className="pt-8 pb-20 px-4 md:px-6 max-w-6xl mx-auto">
+          <AnimatePresence mode="wait">
+            {/* SECCIÓN 1: ANÁLISIS POR ID - DISEÑO MEJORADO */}
+            {currentSection === "metrics" && (
               <motion.div
-                layout
-                className="bg-white border-0 shadow-lg shadow-blue-500/5 rounded-lg p-6 md:p-8"
+                key="metrics-section"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.4 }}
+                className="space-y-8"
               >
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      ID del Dataset
-                    </label>
-                    <div className="flex gap-3 flex-col md:flex-row">
-                      <input
-                        type="text"
-                        value={datasetInput}
-                        onChange={(e) => setDatasetInput(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" && !initializing && !loading && datasetInput.trim()) {
-                            handleAnalyze();
-                          }
-                        }}
-                        disabled={initializing || loading}
-                        placeholder="ej: 8dbv-wsjq"
-                        className="flex-1 px-4 py-3 border-2 border-gray-200 bg-white rounded-lg focus:border-[#2962FF] focus:ring-2 focus:ring-[#2962FF]/20 focus:bg-white transition-all disabled:opacity-50 disabled:cursor-not-allowed text-gray-900 placeholder-gray-400 font-medium"
-                      />
-                      <button
-                        onClick={handleAnalyze}
-                        disabled={initializing || loading || !datasetInput.trim()}
-                        className="px-6 py-3 bg-gradient-to-r from-[#2962FF] to-[#1E4ED8] hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20 text-white font-semibold rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100 disabled:hover:shadow-none flex items-center justify-center gap-2 whitespace-nowrap"
-                      >
-                        {initializing || loading ? (
-                          <>
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            <span>{initializing ? 'Iniciando...' : 'Analizando...'}</span>
-                          </>
-                        ) : (
-                          <>
-                            <span>Analizar Dataset</span>
-                          </>
-                        )}
-                      </button>
-                    </div>
-                    <p className="text-xs text-gray-500 mt-2">
-                      Encuentra IDs en <strong>datos.gov.co</strong>
-                    </p>
-                  </div>
-
-                  {/* Info Badges */}
-                  {datasetInfo.records_count && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.2 }}
-                      className="flex flex-wrap gap-2 pt-2"
-                    >
-                      <span className="px-3 py-1 bg-green-50 text-green-700 rounded-full text-xs font-medium">
-                        ✓ {datasetInfo.records_count} registros
-                      </span>
-                      {datasetInfo.rows && datasetInfo.columns && (
-                        <span className="px-3 py-1 bg-blue-50 text-[#2962FF] rounded-full text-xs font-medium">
-                          {datasetInfo.rows} × {datasetInfo.columns}
-                        </span>
-                      )}
-                      {datasetInfo.limit_reached && (
-                        <span className="px-3 py-1 bg-yellow-50 text-yellow-700 rounded-full text-xs font-medium">
-                          ⚠️ Límite alcanzado
-                        </span>
-                      )}
-                    </motion.div>
-                  )}
+                {/* Header de Sección - Centrado y Minimalista */}
+                <div className="text-center mb-12">
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="inline-flex items-center gap-3 mb-4 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full border border-white/20 shadow-sm"
+                  >
+                    <div className="w-2 h-2 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full animate-pulse"></div>
+                    <span className="text-sm font-medium text-white bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+                      Análisis de Calidad de Datos
+                    </span>
+                  </motion.div>
+                  
+                  <motion.h1
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="text-5xl md:text-6xl font-bold text-white mb-4"
+                  >
+                    DataCensus
+                  </motion.h1>
+                  
+                  <motion.p
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="text-xl text-cyan-100 max-w-2xl mx-auto leading-relaxed"
+                  >
+                    Evalúa la calidad de tus datasets usando estándares <span className="font-semibold text-white">ISO/IEC 25012</span>
+                  </motion.p>
                 </div>
-              </motion.div>
 
-              {/* Error Alert - Diseño Moderno */}
-              {error && (
+                {/* Buscador Principal - Diseño Futurista y Minimalista */}
                 <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.4, duration: 0.5 }}
+                  className="relative"
                 >
-                  <Alert className="border-0 bg-red-50 shadow-lg shadow-red-500/5">
-                    <AlertCircle className="h-4 w-4 text-red-600" />
-                    <AlertTitle className="text-red-900 font-semibold">Error</AlertTitle>
-                    <AlertDescription className="text-red-800">{error}</AlertDescription>
-                  </Alert>
+                  {/* Efectos de fondo futuristas */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 rounded-3xl blur-xl"></div>
+                  <div className="absolute -inset-1 bg-gradient-to-r from-cyan-400/20 via-transparent to-blue-400/20 rounded-3xl blur-sm"></div>
+                  
+                  <Card className="relative bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl shadow-cyan-500/10 rounded-3xl overflow-hidden">
+                    <CardContent className="p-8 md:p-12">
+                      <div className="text-center mb-8">
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: 0.5 }}
+                          className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-2xl mb-4 shadow-lg shadow-cyan-500/25"
+                        >
+                          <Search className="w-8 h-8 text-white" />
+                        </motion.div>
+                        <h2 className="text-2xl font-bold text-white mb-2">
+                          Ingresa el ID del Dataset
+                        </h2>
+                        <p className="text-cyan-100">
+                          Encuentra IDs de datasets públicos en <span className="font-semibold text-cyan-300">datos.gov.co</span>
+                        </p>
+                      </div>
+
+                      <div className="space-y-6 max-w-2xl mx-auto">
+                        {/* Input Group */}
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.6 }}
+                          className="relative"
+                        >
+                          <div className="flex flex-col md:flex-row gap-4 items-stretch md:items-end">
+                            <div className="flex-1">
+                              <label className="block text-sm font-semibold text-cyan-100 mb-3 text-center md:text-left">
+                                Identificador del Dataset
+                              </label>
+                              <div className="relative group">
+                                <input
+                                  type="text"
+                                  value={datasetInput}
+                                  onChange={(e) => setDatasetInput(e.target.value)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Enter" && !initializing && !loading && datasetInput.trim()) {
+                                      handleAnalyze();
+                                    }
+                                  }}
+                                  disabled={initializing || loading}
+                                  placeholder="ej: 8dbv-wsjq"
+                                  className="w-full px-6 py-4 bg-white/10 backdrop-blur-sm border-2 border-white/20 rounded-2xl focus:border-cyan-400 focus:ring-4 focus:ring-cyan-400/20 focus:bg-white/15 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-white placeholder-cyan-200 font-medium text-center md:text-left group-hover:border-white/30 shadow-lg shadow-cyan-500/10"
+                                />
+                                <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-cyan-500/0 via-blue-500/0 to-purple-500/0 group-hover:from-cyan-500/10 group-hover:via-blue-500/10 group-hover:to-purple-500/10 transition-all duration-500 pointer-events-none"></div>
+                              </div>
+                            </div>
+                            
+                            <motion.button
+                              onClick={handleAnalyze}
+                              disabled={initializing || loading || !datasetInput.trim()}
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                              className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-bold rounded-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100 shadow-xl shadow-cyan-500/25 hover:shadow-2xl hover:shadow-cyan-500/40 flex items-center justify-center gap-3 whitespace-nowrap min-w-[160px]"
+                            >
+                              {initializing || loading ? (
+                                <>
+                                  <Loader2 className="w-5 h-5 animate-spin" />
+                                  <span className="font-semibold">
+                                    {initializing ? 'Iniciando...' : 'Analizando...'}
+                                  </span>
+                                </>
+                              ) : (
+                                <>
+                                  <Sparkles className="w-5 h-5" />
+                                  <span className="font-bold">Iniciar Análisis</span>
+                                </>
+                              )}
+                            </motion.button>
+                          </div>
+                        </motion.div>
+
+                        {/* Info Badges */}
+                        {datasetInfo.records_count && (
+                          <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.7 }}
+                            className="flex flex-wrap justify-center gap-3 pt-4"
+                          >
+                            <span className="px-4 py-2 bg-green-500/20 text-green-300 rounded-full text-sm font-semibold border border-green-400/30 backdrop-blur-sm">
+                              ✓ {datasetInfo.records_count} registros
+                            </span>
+                            {datasetInfo.rows && datasetInfo.columns && (
+                              <span className="px-4 py-2 bg-blue-500/20 text-blue-300 rounded-full text-sm font-semibold border border-blue-400/30 backdrop-blur-sm">
+                                📊 {datasetInfo.rows} filas × {datasetInfo.columns} columnas
+                              </span>
+                            )}
+                            {datasetInfo.limit_reached && (
+                              <span className="px-4 py-2 bg-yellow-500/20 text-yellow-300 rounded-full text-sm font-semibold border border-yellow-400/30 backdrop-blur-sm">
+                                ⚠️ Límite de datos alcanzado
+                              </span>
+                            )}
+                          </motion.div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
                 </motion.div>
-              )}
 
-              {/* Results Section */}
-              {results && !loading && analysisStarted && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <div className="mb-6 flex items-center gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-green-500" />
-                    <p className="text-sm font-semibold text-green-700">Análisis completado exitosamente</p>
-                  </div>
-                  <MetricsDisplay
-                    results={results}
-                    datasetName={datasetInfo.dataset_name}
-                    datasetId={datasetInfo.dataset_id}
-                  />
-                </motion.div>
-              )}
+                {/* Error Alert */}
+                {error && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="max-w-2xl mx-auto"
+                  >
+                    <Alert className="border-0 bg-red-500/20 backdrop-blur-sm shadow-lg shadow-red-500/5 rounded-2xl border border-red-400/30">
+                      <AlertCircle className="h-5 w-5 text-red-300" />
+                      <AlertTitle className="text-red-100 font-semibold">Error en el análisis</AlertTitle>
+                      <AlertDescription className="text-red-200">{error}</AlertDescription>
+                    </Alert>
+                  </motion.div>
+                )}
 
-              {/* Loading State */}
-              {(initializing || loading) && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="flex flex-col items-center justify-center py-20"
-                >
-                  <div className="relative w-20 h-20 mb-6">
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                      className="w-full h-full"
-                    >
-                      <div className="w-full h-full bg-gradient-to-r from-[#2962FF] to-[#1E4ED8] rounded-full opacity-30" />
-                    </motion.div>
-                    <motion.div
-                      animate={{ scale: [1, 1.1, 1] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                      className="absolute inset-0 bg-gradient-to-r from-[#2962FF] to-[#1E4ED8] rounded-full opacity-10"
+                {/* Results Section */}
+                {results && !loading && analysisStarted && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                    className="max-w-6xl mx-auto"
+                  >
+                    <div className="mb-6 flex items-center justify-center gap-3">
+                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                      <CheckCircle2 className="w-5 h-5 text-green-400" />
+                      <p className="text-sm font-semibold text-green-300">Análisis completado exitosamente</p>
+                    </div>
+                    <MetricsDisplay
+                      results={results}
+                      datasetName={datasetInfo.dataset_name}
+                      datasetId={datasetInfo.dataset_id}
                     />
-                  </div>
-                  <p className="text-gray-600 font-medium text-center">
-                    {initializing ? "Inicializando dataset..." : "Analizando métricas de calidad..."}
-                  </p>
-                </motion.div>
-              )}
-            </motion.div>
-          )}
+                  </motion.div>
+                )}
 
-          {/* SECCIÓN 2: AGENTE DE IA */}
-          {currentSection === "search" && (
-            <motion.div
-              key="search-section"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.4 }}
-            >
-              <SearchAgentSection />
-            </motion.div>
-          )}
+                {/* Loading State - Diseño Mejorado */}
+                {(initializing || loading) && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex flex-col items-center justify-center py-20"
+                  >
+                    <div className="relative w-24 h-24 mb-6">
+                      {/* Orbital spinner */}
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                        className="absolute inset-0 border-4 border-cyan-200/30 border-t-cyan-400 border-r-blue-400 rounded-full"
+                      ></motion.div>
+                      <motion.div
+                        animate={{ rotate: -360, scale: [1, 1.1, 1] }}
+                        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                        className="absolute inset-4 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full opacity-20"
+                      ></motion.div>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <Database className="w-8 h-8 text-cyan-300" />
+                      </div>
+                    </div>
+                    <p className="text-cyan-100 font-medium text-center text-lg">
+                      {initializing ? "Inicializando dataset..." : "Analizando métricas de calidad..."}
+                    </p>
+                    <p className="text-cyan-200 text-center mt-2">
+                      Esto puede tomar unos segundos
+                    </p>
+                  </motion.div>
+                )}
+              </motion.div>
+            )}
 
-          {/* SECCIÓN 3: MÉTRICAS GENERALES */}
-          {currentSection === "global" && (
-            <motion.div
-              key="global-section"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.4 }}
-            >
-              <GlobalMetricsSection />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </main>
+            {/* SECCIÓN 2: AGENTE DE IA */}
+            {currentSection === "search" && (
+              <motion.div
+                key="search-section"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.4 }}
+              >
+                <SearchAgentSection />
+              </motion.div>
+            )}
 
-      {/* Footer */}
-      <footer className="border-t border-gray-100 bg-white/50 backdrop-blur-md py-8 mt-20">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 text-center">
-          <p className="text-sm text-gray-600 mb-2">
-            DataCensus © 2025 • Plataforma de Evaluación de Calidad de Datos
-          </p>
-          <p className="text-xs text-gray-500">
-            Basado en estándares ISO/IEC 25012 • Ministerio de Tecnologías de la Información y Comunicaciones
-          </p>
-        </div>
-      </footer>
+            {/* SECCIÓN 3: MÉTRICAS GENERALES */}
+            {currentSection === "global" && (
+              <motion.div
+                key="global-section"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.4 }}
+              >
+                <GlobalMetricsSection />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </main>
+
+        {/* Footer Minimalista */}
+        <footer className="border-t border-white/10 bg-white/5 backdrop-blur-md py-8 mt-20">
+          <div className="max-w-6xl mx-auto px-4 md:px-6 text-center">
+            <p className="text-sm text-cyan-100 mb-2">
+              DataCensus © 2025 • Plataforma de Evaluación de Calidad de Datos
+            </p>
+            <p className="text-xs text-cyan-200">
+              Basado en estándares ISO/IEC 25012 • Ministerio de Tecnologías de la Información y Comunicaciones
+            </p>
+          </div>
+        </footer>
+      </div>
     </div>
   );
 };
