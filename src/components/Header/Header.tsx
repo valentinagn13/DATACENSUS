@@ -40,7 +40,7 @@ export const Header = ({
                   </div>
                   <span className={`font-semibold transition-colors ${
                     isActive 
-                      ? "text-white bg-gradient-to-r from-cyan-500 to-blue-600 bg-clip-text text-transparent" 
+                      ? "text-black bg-gradient-to-r from-cyan-500 to-blue-600 bg-clip-text text-transparent" 
                       : "text-gray-600 group-hover:text-gray-900"
                   }`}>
                     {item.label}
