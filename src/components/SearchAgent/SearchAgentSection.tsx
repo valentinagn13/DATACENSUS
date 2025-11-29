@@ -7,18 +7,43 @@ import { motion } from "framer-motion";
 export const SearchAgentSection = () => {
   const [query, setQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [response, setResponse] = useState("");
   const [suggestions] = useState([
     "Datasets sobre educación con actualización reciente",
     "Análisis de calidad de datasets de salud pública",
     "Datasets con más de 10,000 registros",
   ]);
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     if (!query.trim()) return;
     setIsLoading(true);
-    setTimeout(() => {
+    setResponse("");
+
+    try {
+      const res = await fetch("https://uzuma.duckdns.org/webhook/agent", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userMessage: query
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Error al conectar con el agente");
+      }
+
+      const data = await res.json();
+      if (data && data[0] && data[0].output) {
+        setResponse(data[0].output);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setResponse("Error al conectar con el agente. Intenta de nuevo.");
+    } finally {
       setIsLoading(false);
-    }, 2000);
+    }
   };
 
   return (
@@ -128,7 +153,7 @@ export const SearchAgentSection = () => {
         ))}
       </motion.div>
 
-      {/* Placeholder for Results */}
+      {/* Loading State */}
       {isLoading && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -144,6 +169,27 @@ export const SearchAgentSection = () => {
               El agente está buscando el dataset perfecto para ti...
             </p>
           </div>
+        </motion.div>
+      )}
+
+      {/* Response Display */}
+      {response && !isLoading && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <Card className="p-6 border-0 shadow-lg bg-white">
+            <div className="flex items-start gap-3 mb-3">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#2962FF] to-[#1E4ED8] flex items-center justify-center flex-shrink-0">
+                <Sparkles className="w-4 h-4 text-white" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-gray-900 mb-2">Respuesta del Agente</h3>
+                <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{response}</p>
+              </div>
+            </div>
+          </Card>
         </motion.div>
       )}
     </div>
