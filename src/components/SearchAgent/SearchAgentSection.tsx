@@ -1,23 +1,40 @@
-import { useState } from "react";
-import { Search, Sparkles, ArrowRight, Loader2 } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Sparkles, Send, Loader2, User, Bot } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+
+interface Message {
+  role: "user" | "assistant";
+  content: string;
+}
 
 export const SearchAgentSection = () => {
   const [query, setQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [response, setResponse] = useState("");
+  const [messages, setMessages] = useState<Message[]>([]);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const [suggestions] = useState([
     "Datasets sobre educación con actualización reciente",
     "Análisis de calidad de datasets de salud pública",
     "Datasets con más de 10,000 registros",
   ]);
 
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
   const handleSearch = async () => {
-    if (!query.trim()) return;
+    if (!query.trim() || isLoading) return;
+    
+    const userMessage = query;
+    setQuery("");
+    setMessages(prev => [...prev, { role: "user", content: userMessage }]);
     setIsLoading(true);
-    setResponse("");
 
     try {
       const res = await fetch("https://uzuma.duckdns.org/webhook/agent", {
@@ -26,7 +43,7 @@ export const SearchAgentSection = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          userMessage: query
+          userMessage: userMessage
         }),
       });
 
@@ -36,162 +53,152 @@ export const SearchAgentSection = () => {
 
       const data = await res.json();
       if (data && data[0] && data[0].output) {
-        setResponse(data[0].output);
+        setMessages(prev => [...prev, { role: "assistant", content: data[0].output }]);
       }
     } catch (error) {
       console.error("Error:", error);
-      setResponse("Error al conectar con el agente. Intenta de nuevo.");
+      setMessages(prev => [...prev, { 
+        role: "assistant", 
+        content: "Lo siento, hubo un error al procesar tu solicitud. Por favor intenta de nuevo." 
+      }]);
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleSuggestionClick = (suggestion: string) => {
+    setQuery(suggestion);
+  };
+
   return (
-    <div className="space-y-8">
-      {/* Hero Section */}
+    <div className="flex flex-col h-[calc(100vh-200px)] max-w-4xl mx-auto">
+      {/* Header */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
+        className="mb-6 text-center"
       >
-        <div className="mb-8">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-[#2962FF] rounded-full mb-4">
-            <Sparkles className="w-4 h-4" />
-            <span className="text-sm font-semibold">Búsqueda Inteligente Impulsada por IA</span>
-          </div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            Encuentra tu Dataset Perfecto
-          </h1>
-          <p className="text-lg text-gray-600">
-            Describe lo que buscas en lenguaje natural y nuestro agente de IA te ayudará a encontrar el dataset ideal con la calidad que necesitas.
-          </p>
+        <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/90 backdrop-blur-sm rounded-full mb-3 border border-gray-200">
+          <Sparkles className="w-4 h-4 text-blue-600" />
+          <span className="text-sm font-semibold text-gray-700">Agente de Búsqueda IA</span>
         </div>
+        <h1 className="text-3xl font-bold text-white mb-2">
+          Encuentra tu Dataset Perfecto
+        </h1>
+        <p className="text-cyan-100">
+          Pregunta en lenguaje natural y te ayudaré a encontrar datasets de calidad
+        </p>
+      </motion.div>
 
-        {/* Search Box */}
-        <Card className="p-6 border-0 shadow-lg shadow-blue-500/5 bg-white">
-          <div className="flex flex-col gap-4">
-            <div className="flex gap-3">
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                <Input
-                  placeholder="¿Qué dataset estás buscando? Describe tus necesidades..."
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-                  className="pl-10 h-12 border-0 bg-gray-50/50 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:bg-white text-base transition-colors"
-                  disabled={isLoading}
-                />
+      {/* Messages Area */}
+      <Card className="flex-1 overflow-hidden bg-white border-0 shadow-xl mb-4 flex flex-col">
+        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+          {messages.length === 0 ? (
+            <div className="h-full flex flex-col items-center justify-center text-center px-4">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-4">
+                <Sparkles className="w-8 h-8 text-white" />
               </div>
-              <button
-                onClick={handleSearch}
-                disabled={isLoading || !query.trim()}
-                aria-label={isLoading ? "Buscando" : "Buscar"}
-                className="bg-gradient-to-r from-[#2962FF] to-[#1E4ED8] hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20 text-white px-3 sm:px-6 gap-2 h-12 rounded-lg font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center"
-              >
-                {isLoading ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <ArrowRight className="w-4 h-4" />
-                )}
-                <span className="hidden sm:inline">
-                  {isLoading ? "Buscando..." : "Buscar"}
-                </span>
-              </button>
-            </div>
-
-            {/* Suggestions */}
-            <div className="space-y-2">
-              <p className="text-xs text-gray-500 font-medium">Ejemplos de búsqueda:</p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                ¿En qué puedo ayudarte?
+              </h3>
+              <p className="text-gray-600 mb-6 max-w-md">
+                Escribe tu consulta o selecciona uno de los ejemplos
+              </p>
+              <div className="grid grid-cols-1 gap-2 w-full max-w-md">
                 {suggestions.map((suggestion, idx) => (
                   <button
                     key={idx}
-                    onClick={() => setQuery(suggestion)}
-                    className="text-left px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg text-sm text-gray-700 transition-colors duration-200"
+                    onClick={() => handleSuggestionClick(suggestion)}
+                    className="text-left px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-xl text-sm text-gray-700 transition-all duration-200 border border-gray-200 hover:border-blue-300"
                   >
                     {suggestion}
                   </button>
                 ))}
               </div>
             </div>
-          </div>
-        </Card>
-      </motion.div>
-
-      {/* Features Grid */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.6, delay: 0.1 }}
-        className="grid grid-cols-1 md:grid-cols-3 gap-4"
-      >
-        {[
-          {
-            title: "Búsqueda Natural",
-            description: "Usa lenguaje conversacional para buscar datasets",
-            icon: "🧠",
-          },
-          {
-            title: "Filtrado Inteligente",
-            description: "IA filtra por calidad, actualización y relevancia",
-            icon: "🎯",
-          },
-          {
-            title: "Análisis Inmediato",
-            description: "Obtén métricas de calidad al instante",
-            icon: "⚡",
-          },
-        ].map((feature, idx) => (
-          <Card
-            key={idx}
-            className="p-4 border-0 shadow-lg shadow-blue-500/5 hover:shadow-lg hover:shadow-blue-500/10 transition-shadow bg-white"
-          >
-            <div className="text-3xl mb-2">{feature.icon}</div>
-            <h3 className="font-semibold text-gray-900 mb-1">{feature.title}</h3>
-            <p className="text-sm text-gray-600">{feature.description}</p>
-          </Card>
-        ))}
-      </motion.div>
-
-      {/* Loading State */}
-      {isLoading && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="mt-12 text-center"
-        >
-          <div className="inline-flex flex-col items-center gap-4">
-            <div className="relative w-12 h-12">
-              <div className="absolute inset-0 bg-gradient-to-r from-[#2962FF] to-[#1E4ED8] rounded-full animate-pulse" />
-              <div className="absolute inset-2 bg-white rounded-full" />
-            </div>
-            <p className="text-gray-600">
-              El agente está buscando el dataset perfecto para ti...
-            </p>
-          </div>
-        </motion.div>
-      )}
-
-      {/* Response Display */}
-      {response && !isLoading && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <Card className="p-6 border-0 shadow-lg bg-white">
-            <div className="flex items-start gap-3 mb-3">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#2962FF] to-[#1E4ED8] flex items-center justify-center flex-shrink-0">
-                <Sparkles className="w-4 h-4 text-white" />
+          ) : (
+            <AnimatePresence>
+              {messages.map((message, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className={`flex gap-3 ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                >
+                  {message.role === "assistant" && (
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0">
+                      <Bot className="w-5 h-5 text-white" />
+                    </div>
+                  )}
+                  <div
+                    className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+                      message.role === "user"
+                        ? "bg-blue-600 text-white"
+                        : "bg-gray-100 text-gray-900"
+                    }`}
+                  >
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                      {message.content}
+                    </p>
+                  </div>
+                  {message.role === "user" && (
+                    <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
+                      <User className="w-5 h-5 text-white" />
+                    </div>
+                  )}
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          )}
+          
+          {isLoading && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex gap-3"
+            >
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0">
+                <Bot className="w-5 h-5 text-white" />
               </div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-gray-900 mb-2">Respuesta del Agente</h3>
-                <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{response}</p>
+              <div className="bg-gray-100 rounded-2xl px-4 py-3">
+                <div className="flex gap-1">
+                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                </div>
               </div>
-            </div>
-          </Card>
-        </motion.div>
-      )}
+            </motion.div>
+          )}
+          
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* Input Area */}
+        <div className="border-t border-gray-200 p-4 bg-gray-50">
+          <div className="flex gap-2">
+            <Input
+              placeholder="Escribe tu mensaje..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+              className="flex-1 h-12 border-gray-300 bg-white focus:ring-2 focus:ring-blue-500 rounded-xl text-gray-900 placeholder:text-gray-500"
+              disabled={isLoading}
+            />
+            <button
+              onClick={handleSearch}
+              disabled={isLoading || !query.trim()}
+              className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white px-4 rounded-xl transition-colors duration-200 disabled:cursor-not-allowed flex items-center justify-center"
+            >
+              {isLoading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <Send className="w-5 h-5" />
+              )}
+            </button>
+          </div>
+        </div>
+      </Card>
     </div>
   );
 };
