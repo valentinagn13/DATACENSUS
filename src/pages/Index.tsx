@@ -459,35 +459,37 @@ const Index = () => {
               >
                 {/* Header de Sección - Centrado y Minimalista */}
                 <div className="text-center mb-12">
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className="inline-flex items-center gap-3 mb-4 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full border border-white/20 shadow-sm"
-                  >
-                    <div className="w-2 h-2 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full animate-pulse"></div>
-                    <span className="text-sm font-medium text-white bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                      Análisis de Calidad de Datos
-                    </span>
-                  </motion.div>
+<motion.div
+  initial={{ opacity: 0, y: -10 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ delay: 0.1 }}
+  className="inline-flex items-center gap-3 mb-4 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full border border-white/20 shadow-sm"
+>
+  <div className="w-2 h-2 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full animate-pulse"></div>
+  <span className="text-sm font-medium text-black bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+    Basado en estándares ISO/IEC 25012
+  </span>
+</motion.div>
+
+<motion.div
+  initial={{ opacity: 0, y: -10 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ delay: 0.2 }}
+  className="inline-flex items-center gap-3 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full border border-white/20 shadow-sm"
+>
+  <div className="w-2 h-2 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full animate-pulse"></div>
+  <a 
+    href="https://datos.gov.co" 
+    target="_blank" 
+    rel="noopener noreferrer"
+    className="text-sm font-medium text-black bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent hover:underline"
+  >
+    Encuentra datasets en datos.gov.co
+  </a>
+</motion.div>  
+                 
                   
-                  <motion.h1
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="text-5xl md:text-6xl font-bold text-white mb-4"
-                  >
-                    DataCensus
-                  </motion.h1>
-                  
-                  <motion.p
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="text-xl text-cyan-100 max-w-2xl mx-auto leading-relaxed"
-                  >
-                    Evalúa la calidad de tus datasets usando estándares <span className="font-semibold text-white">ISO/IEC 25012</span>
-                  </motion.p>
+                 
                 </div>
 
                 {/* Buscador Principal - Diseño Futurista y Minimalista */}
@@ -504,20 +506,34 @@ const Index = () => {
                   <Card className="relative bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl shadow-cyan-500/10 rounded-3xl overflow-hidden">
                     <CardContent className="p-8 md:p-12">
                       <div className="text-center mb-8">
-                        <motion.div
+                        {/* <motion.div
                           initial={{ opacity: 0, scale: 0.8 }}
                           animate={{ opacity: 1, scale: 1 }}
                           transition={{ delay: 0.5 }}
                           className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-2xl mb-4 shadow-lg shadow-cyan-500/25"
                         >
                           <Search className="w-8 h-8 text-white" />
-                        </motion.div>
-                        <h2 className="text-2xl font-bold text-white mb-2">
-                          Ingresa el ID del Dataset
-                        </h2>
+                        </motion.div> */}
+                         <motion.h1
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="text-5xl md:text-6xl font-bold text-white mb-4"
+                  >
+                    DataCensus
+                  </motion.h1>
+                   {/* <motion.p
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="text-xl text-cyan-100 max-w-2xl mx-auto leading-relaxed"
+                  >
+                    Evalúa la calidad de tus datasets usando estándares <span className="font-semibold text-white">ISO/IEC 25012</span>
+                  </motion.p>
+                       
                         <p className="text-cyan-100">
                           Encuentra IDs de datasets públicos en <span className="font-semibold text-cyan-300">datos.gov.co</span>
-                        </p>
+                        </p> */}
                       </div>
 
                       <div className="space-y-6 max-w-2xl mx-auto">
@@ -575,12 +591,38 @@ const Index = () => {
                           </div>
                         </motion.div>
 
+                        {/* Divider */}
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 0.65 }}
+                          className="flex items-center gap-4"
+                        >
+                          <div className="flex-1 h-px bg-gradient-to-r from-transparent to-white/30"></div>
+                          <span className="text-xs font-semibold text-cyan-200/70 uppercase tracking-wider">o</span>
+                          <div className="flex-1 h-px bg-gradient-to-l from-transparent to-white/30"></div>
+                        </motion.div>
+
+                        {/* Agente IA Button */}
+                        <motion.button
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.7 }}
+                          onClick={() => setCurrentSection("search")}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          className="w-full py-4 px-6 bg-white/10 hover:bg-white/20 border-2 border-white/20 hover:border-white/40 text-white font-semibold rounded-2xl transition-all duration-300 flex items-center justify-center gap-3 backdrop-blur-md shadow-lg shadow-white/5"
+                        >
+                          <Sparkles className="w-5 h-5" />
+                          <span>Busca tu Dataset con Agente de IA</span>
+                        </motion.button>
+
                         {/* Info Badges */}
-                        {datasetInfo.records_count && (
+                        {datasetInfo.records_count ? (
                           <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
-                            transition={{ delay: 0.7 }}
+                            transition={{ delay: 0.8 }}
                             className="flex flex-wrap justify-center gap-3 pt-4"
                           >
                             <span className="px-4 py-2 bg-green-500/20 text-green-300 rounded-full text-sm font-semibold border border-green-400/30 backdrop-blur-sm">
@@ -597,10 +639,26 @@ const Index = () => {
                               </span>
                             )}
                           </motion.div>
-                        )}
+                        ) : null}
                       </div>
                     </CardContent>
                   </Card>
+                </motion.div>
+
+                {/* Warning Alert - Dataset Requirements */}
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="max-w-2xl mx-auto"
+                >
+                  <Alert className="border-0 bg-amber-500/20 backdrop-blur-sm shadow-lg shadow-amber-500/5 rounded-2xl border border-amber-400/30">
+                    <AlertCircle className="h-5 w-5 text-amber-300" />
+                    <AlertTitle className="text-amber-100 font-semibold">Requisitos de análisis</AlertTitle>
+                    <AlertDescription className="text-amber-200">
+                      Solo se pueden analizar activos que estén categorizados como <span className="font-semibold">Público</span>, sean de tipo <span className="font-semibold">Dataset</span> y estén marcados como <span className="font-semibold">Aprobados</span>.
+                    </AlertDescription>
+                  </Alert>
                 </motion.div>
 
                 {/* Error Alert */}
@@ -725,7 +783,7 @@ const Index = () => {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 }}
-                  className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8"
+                  className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 min-h-[160px] flex flex-col justify-center"
                 >
                   <h2 className="text-2xl font-bold text-white mb-4">Acerca de la Plataforma</h2>
                   <p className="text-cyan-100 leading-relaxed">
@@ -744,11 +802,10 @@ const Index = () => {
                   <h2 className="text-2xl font-bold text-white">Repositorios Fuente</h2>
                   
                   {/* Frontend */}
-                  <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <h3 className="text-lg font-semibold text-white mb-2">Frontend</h3>
-                        <p className="text-cyan-100 text-sm mb-4">Interfaz web de DataCensus</p>
+                  <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300 min-h-[160px] flex flex-col justify-between">
+                    <div>
+                      <h3 className="text-lg font-semibold text-white mb-2">Frontend</h3>
+                      <p className="text-cyan-100 text-sm mb-4">Interfaz web de DataCensus</p>
                         <a
                           href="https://github.com/valentinagn13/DATACENSUS"
                           target="_blank"
@@ -760,16 +817,14 @@ const Index = () => {
                           </svg>
                           Ver en GitHub
                         </a>
-                      </div>
                     </div>
                   </div>
 
                   {/* Backend */}
-                  <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <h3 className="text-lg font-semibold text-white mb-2">Backend</h3>
-                        <p className="text-cyan-100 text-sm mb-4">Motor de cálculo de métricas</p>
+                  <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300 min-h-[160px] flex flex-col justify-between">
+                    <div>
+                      <h3 className="text-lg font-semibold text-white mb-2">Backend</h3>
+                      <p className="text-cyan-100 text-sm mb-4">Motor de cálculo de métricas</p>
                         <a
                           href="https://github.com/valentinagn13/Mini_backend_metricas"
                           target="_blank"
@@ -781,7 +836,6 @@ const Index = () => {
                           </svg>
                           Ver en GitHub
                         </a>
-                      </div>
                     </div>
                   </div>
                 </motion.div>

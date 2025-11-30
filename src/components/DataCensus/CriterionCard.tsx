@@ -69,7 +69,7 @@ export const CriterionCard = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay }}
     >
-      <Card className={`bg-gradient-to-br ${colorMap[currentColor]} border backdrop-blur-sm`}>
+      <Card className={`bg-gradient-to-br ${colorMap[currentColor]} border backdrop-blur-sm h-full flex flex-col min-h-[200px]`}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
           <CardTitle className="text-sm font-medium text-foreground">
             {title}
@@ -85,7 +85,7 @@ export const CriterionCard = ({
             </Tooltip>
           </TooltipProvider>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-3 flex-grow flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <Badge variant="secondary" className={badgeColorMap[currentColor]}>
               {displayText}/10
@@ -94,7 +94,7 @@ export const CriterionCard = ({
               {displayText}
             </div>
           </div>
-          <p className="text-xs text-muted-foreground leading-relaxed">
+          <p className="text-xs text-muted-foreground leading-relaxed flex-grow">
             {description}
           </p>
           {extra && (
