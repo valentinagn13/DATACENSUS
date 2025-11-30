@@ -4,17 +4,23 @@ import { motion } from "framer-motion";
 interface HeaderProps {
   currentSection: "metrics" | "search" | "global" | "about";
   onSectionChange: (section: "metrics" | "search" | "global" | "about") => void;
+<<<<<<< HEAD
+=======
+  isEmbedded?: boolean;
+>>>>>>> 7f9ab95 (feat: Enhance Header and SearchAgentSection with new "About" functionality and improved user experience)
 }
 
 export const Header = ({
   currentSection,
   onSectionChange,
+  isEmbedded = false,
 }: HeaderProps) => {
   const navItems = [
     { id: "metrics" as const, label: "Análisis por ID", icon: BarChart3 },
     { id: "search" as const, label: "Agente de IA", icon: Search },
     { id: "global" as const, label: "Métricas Generales", icon: TrendingUp },
   ];
+  const visibleNav = isEmbedded ? navItems.filter(i => i.id === 'metrics') : navItems;
 
   return (
     <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-white/20">
@@ -25,7 +31,7 @@ export const Header = ({
           
           {/* Navegación Centrada - Minimalista */}
           <nav className="flex items-center gap-8">
-            {navItems.map((item) => {
+            {visibleNav.map((item) => {
               const Icon = item.icon;
               const isActive = currentSection === item.id;
               return (

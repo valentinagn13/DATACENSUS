@@ -171,6 +171,7 @@ const Index = () => {
   const [analysisStarted, setAnalysisStarted] = useState(false);
   const [isLoadingCompletitud, setIsLoadingCompletitud] = useState(false);
   const [isLoadingUnicidad, setIsLoadingUnicidad] = useState(false);
+  const [isEmbedded, setIsEmbedded] = useState(false);
 
   // Verificar si el servidor está activo
   const checkServerStatus = async (): Promise<boolean> => {
@@ -273,12 +274,17 @@ const Index = () => {
     }
   };
 
+<<<<<<< HEAD
   const fetchFastMetrics = async () => {
+=======
+  const fetchFastMetrics = async (datasetId?: string) => {
+>>>>>>> 7f9ab95 (feat: Enhance Header and SearchAgentSection with new "About" functionality and improved user experience)
     // Fetch actualidad, confidencialidad, unicidad, accesibilidad, conformidad, portabilidad, disponibilidad, trazabilidad, credibilidad and recuperabilidad (fast endpoints)
     const fastEndpoints = ["actualidad", "confidencialidad", "unicidad", "accesibilidad", "conformidad", "portabilidad", "disponibilidad", "trazabilidad", "credibilidad", "recuperabilidad"];
     try {
+      const id = datasetId ?? datasetInput;
       const promises = fastEndpoints.map(async (criterion) => {
-        const response = await fetch(`${API_BASE_URL}/${criterion}?dataset_id=${datasetInput}`);
+        const response = await fetch(`${API_BASE_URL}/${criterion}?dataset_id=${id}`);
         if (!response.ok) {
           throw new Error(`Error al obtener ${criterion}: ${response.statusText}`);
         }
@@ -296,11 +302,12 @@ const Index = () => {
     }
   };
 
-  const fetchCompletitudMetric = async () => {
+  const fetchCompletitudMetric = async (datasetId?: string) => {
     // Fetch completitud separately (slow endpoint)
     setIsLoadingCompletitud(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/completitud?dataset_id=${datasetInput}`);
+      const id = datasetId ?? datasetInput;
+      const response = await fetch(`${API_BASE_URL}/completitud?dataset_id=${id}`);
       if (!response.ok) {
         throw new Error(`Error al obtener completitud: ${response.statusText}`);
       }
@@ -315,7 +322,7 @@ const Index = () => {
     }
   };
 
-  const fetchAllMetrics = async () => {
+  const fetchAllMetrics = async (datasetId?: string) => {
     setLoading(true);
     setError(null);
 
@@ -325,7 +332,7 @@ const Index = () => {
 
     try {
       // Fetch fast metrics first and show immediately
-      const fastMetrics = await fetchFastMetrics();
+      const fastMetrics = await fetchFastMetrics(datasetId);
 
       const metricsObj: any = { details: {} };
       fastMetrics.forEach(({ criterion, value, details }) => {
@@ -345,7 +352,7 @@ const Index = () => {
       toast.success("Métricas rápidas cargadas");
 
       // Fetch completitud in background without blocking UI
-      fetchCompletitudMetric()
+      fetchCompletitudMetric(datasetId)
         .then((completitudData) => {
           setResults((prev) => {
             if (!prev) return prev;
@@ -385,22 +392,25 @@ const Index = () => {
     }
   };
 
-  const handleAnalyze = async () => {
-    if (!datasetInput.trim()) {
+  const handleAnalyze = async (overrideId?: string) => {
+    const id = overrideId ?? datasetInput;
+    if (!id || !id.trim()) {
       setError("Por favor, ingresa un ID de dataset válido");
       toast.error("Dataset ID requerido");
       return;
     }
 
+    // Update input shown to user
+    setDatasetInput(id);
     setAnalysisStarted(true);
-    const initialized = await initializeDataset(datasetInput);
+    const initialized = await initializeDataset(id);
 
     if (initialized) {
       // After initialization, request backend to load full data (POST /load_data)
-      const loaded = await loadDatasetRecords(datasetInput);
+      const loaded = await loadDatasetRecords(id);
       if (loaded) {
         // slight delay to allow backend to finish any processing
-        setTimeout(() => fetchAllMetrics(), 300);
+        setTimeout(() => fetchAllMetrics(id), 300);
       }
     }
   };
@@ -414,6 +424,22 @@ const Index = () => {
     });
   }, []);
 
+  // Si la página se carga con ?dataset_id=XXX iniciamos análisis automáticamente
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const ds = params.get('dataset_id');
+      const embedFlag = params.get('embed');
+      if (embedFlag === '1' || embedFlag === 'true') setIsEmbedded(true);
+      if (ds && ds.trim()) {
+        // run analysis for that dataset id
+        handleAnalyze(ds.trim());
+      }
+    } catch (e) {
+      // ignore
+    }
+  }, []);
+
   return (
     <div className="min-h-screen relative">
       {/* Fondo de red neuronal */}
@@ -421,7 +447,7 @@ const Index = () => {
       
       {/* Contenido principal */}
       <div className="relative z-10">
-        <Header currentSection={currentSection} onSectionChange={setCurrentSection} />
+        <Header currentSection={currentSection} onSectionChange={setCurrentSection} isEmbedded={isEmbedded} />
 
         <main className="pt-8 pb-20 px-4 md:px-6 max-w-6xl mx-auto">
           <AnimatePresence mode="wait">
@@ -530,7 +556,7 @@ const Index = () => {
                             </div>
                             
                             <motion.button
-                              onClick={handleAnalyze}
+                              onClick={() => handleAnalyze()}
                               disabled={initializing || loading || !datasetInput.trim()}
                               whileHover={{ scale: 1.02 }}
                               whileTap={{ scale: 0.98 }}
