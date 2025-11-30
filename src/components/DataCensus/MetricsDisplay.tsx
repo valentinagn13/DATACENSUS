@@ -52,7 +52,7 @@ export const MetricsDisplay = ({
             )}
             {datasetId && (
               <a
-                href={`https://datos.gob.es/es/catalogo/explore?sort=-views&dataset=${datasetId}`}
+                                href={`https://www.datos.gov.co/d/${datasetId}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-4 py-2 bg-[#2962FF]/10 hover:bg-[#2962FF]/20 text-[#2962FF] font-medium rounded-lg transition-colors"
@@ -202,6 +202,26 @@ export const MetricsDisplay = ({
             tooltipContent="Evalúa si los datos son accesibles, recuperables y están correctamente documentados para su uso"
             color="blue"
             delay={0.35}
+          />
+
+          {/* Portabilidad */}
+          <CriterionCard
+            title="Portabilidad"
+            value={results.portabilidad}
+            description="Facilidad para trasladar y reutilizar datos entre sistemas"
+            tooltipContent="Evalúa si los datos y formatos permiten transferencia y uso entre diferentes entornos"
+            color="purple"
+            delay={0.37}
+          />
+
+          {/* Disponibilidad */}
+          <CriterionCard
+            title="Disponibilidad"
+            value={results.disponibilidad}
+            description="Accesibilidad temporal y garantía de disponibilidad del servicio"
+            tooltipContent="Evalúa el tiempo de disponibilidad del dataset y garantía de acceso sin interrupciones"
+            color="teal"
+            delay={0.39}
           />
 
           {/* Completitud - Show loading skeleton if undefined */}

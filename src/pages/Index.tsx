@@ -273,8 +273,8 @@ const Index = () => {
   };
 
   const fetchFastMetrics = async () => {
-    // Fetch actualidad, confidencialidad, unicidad, accesibilidad and conformidad (fast endpoints)
-    const fastEndpoints = ["actualidad", "confidencialidad", "unicidad", "accesibilidad", "conformidad"];
+    // Fetch actualidad, confidencialidad, unicidad, accesibilidad, conformidad, portabilidad and disponibilidad (fast endpoints)
+    const fastEndpoints = ["actualidad", "confidencialidad", "unicidad", "accesibilidad", "conformidad", "portabilidad", "disponibilidad"];
     try {
       const promises = fastEndpoints.map(async (criterion) => {
         const response = await fetch(`${API_BASE_URL}/${criterion}?dataset_id=${datasetInput}`);

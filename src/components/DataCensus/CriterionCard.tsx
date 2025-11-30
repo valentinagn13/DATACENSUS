@@ -10,7 +10,7 @@ interface CriterionCardProps {
   value: number | undefined; // Cambiado para aceptar undefined
   description: string;
   tooltipContent: string;
-  color: "green" | "yellow" | "red" | "blue";
+  color?: "green" | "yellow" | "red" | "blue" | "purple" | "teal";
   extra?: React.ReactNode;
   delay?: number;
 }
@@ -19,14 +19,18 @@ const colorMap = {
   green: "from-green-500/10 to-green-600/10 border-green-200",
   yellow: "from-yellow-500/10 to-yellow-600/10 border-yellow-200", 
   red: "from-red-500/10 to-red-600/10 border-red-200",
-  blue: "from-blue-500/10 to-blue-600/10 border-blue-200"
+  blue: "from-blue-500/10 to-blue-600/10 border-blue-200",
+  purple: "from-purple-500/10 to-purple-600/10 border-purple-200",
+  teal: "from-teal-500/10 to-teal-600/10 border-teal-200"
 };
 
 const badgeColorMap = {
   green: "bg-green-100 text-green-800 hover:bg-green-200",
   yellow: "bg-yellow-100 text-yellow-800 hover:bg-yellow-200",
   red: "bg-red-100 text-red-800 hover:bg-red-200",
-  blue: "bg-blue-100 text-blue-800 hover:bg-blue-200"
+  blue: "bg-blue-100 text-blue-800 hover:bg-blue-200",
+  purple: "bg-purple-100 text-purple-800 hover:bg-purple-200",
+  teal: "bg-teal-100 text-teal-800 hover:bg-teal-200"
 };
 
 export const CriterionCard = ({
