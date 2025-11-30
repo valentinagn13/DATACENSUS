@@ -57,7 +57,7 @@ export const MetricsDisplay = ({
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-4 py-2 bg-[#2962FF]/10 hover:bg-[#2962FF]/20 text-[#2962FF] font-medium rounded-lg transition-colors"
               >
-                <span>Ver en datos.gob.es</span>
+                <span>Ver en Datos Abiertos</span>
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                 </svg>
@@ -222,6 +222,36 @@ export const MetricsDisplay = ({
             tooltipContent="Evalúa el tiempo de disponibilidad del dataset y garantía de acceso sin interrupciones"
             color="teal"
             delay={0.39}
+          />
+
+          {/* Trazabilidad */}
+          <CriterionCard
+            title="Trazabilidad"
+            value={results.trazabilidad}
+            description="Capacidad de rastrear el origen y cambios de los datos"
+            tooltipContent="Evalúa la capacidad de auditar y rastrear el origen, transformaciones y cambios de los datos en el tiempo"
+            color="orange"
+            delay={0.41}
+          />
+
+          {/* Credibilidad */}
+          <CriterionCard
+            title="Credibilidad"
+            value={results.credibilidad}
+            description="Confiabilidad y autoridad de la fuente de datos"
+            tooltipContent="Evalúa la credibilidad de la fuente, reputación del publicador y confiabilidad de los datos proporcionados"
+            color="indigo"
+            delay={0.43}
+          />
+
+          {/* Recuperabilidad */}
+          <CriterionCard
+            title="Recuperabilidad"
+            value={results.recuperabilidad}
+            description="Capacidad de recuperarse ante fallos o pérdida de datos"
+            tooltipContent="Evalúa la existencia de mecanismos de respaldo, recuperación ante desastres y continuidad de disponibilidad"
+            color="rose"
+            delay={0.45}
           />
 
           {/* Completitud - Show loading skeleton if undefined */}

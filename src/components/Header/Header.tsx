@@ -1,9 +1,9 @@
-import { BarChart3, Search, TrendingUp } from "lucide-react";
+import { BarChart3, Search, TrendingUp, HelpCircle } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface HeaderProps {
-  currentSection: "metrics" | "search" | "global";
-  onSectionChange: (section: "metrics" | "search" | "global") => void;
+  currentSection: "metrics" | "search" | "global" | "about";
+  onSectionChange: (section: "metrics" | "search" | "global" | "about") => void;
 }
 
 export const Header = ({
@@ -19,7 +19,10 @@ export const Header = ({
   return (
     <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-white/20">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-center py-4">
+        <div className="flex items-center justify-between py-4">
+          {/* Espaciador izquierdo */}
+          <div className="w-12"></div>
+          
           {/* Navegación Centrada - Minimalista */}
           <nav className="flex items-center gap-8">
             {navItems.map((item) => {
@@ -60,6 +63,19 @@ export const Header = ({
               );
             })}
           </nav>
+
+          {/* About Button - Right Corner */}
+          <button
+            onClick={() => onSectionChange("about")}
+            className={`p-2 rounded-lg transition-all duration-200 flex items-center justify-center ${
+              currentSection === "about"
+                ? "bg-gradient-to-br from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/25"
+                : "bg-white/50 text-gray-600 hover:bg-white hover:text-gray-900 hover:shadow-md"
+            }`}
+            title="Sobre este sitio web"
+          >
+            <HelpCircle className="w-5 h-5" />
+          </button>
         </div>
       </div>
     </header>

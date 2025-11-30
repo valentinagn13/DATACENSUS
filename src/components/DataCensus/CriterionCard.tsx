@@ -10,7 +10,7 @@ interface CriterionCardProps {
   value: number | undefined; // Cambiado para aceptar undefined
   description: string;
   tooltipContent: string;
-  color?: "green" | "yellow" | "red" | "blue" | "purple" | "teal";
+  color?: "green" | "yellow" | "red" | "blue" | "purple" | "teal" | "orange" | "indigo" | "rose";
   extra?: React.ReactNode;
   delay?: number;
 }
@@ -21,7 +21,10 @@ const colorMap = {
   red: "from-red-500/10 to-red-600/10 border-red-200",
   blue: "from-blue-500/10 to-blue-600/10 border-blue-200",
   purple: "from-purple-500/10 to-purple-600/10 border-purple-200",
-  teal: "from-teal-500/10 to-teal-600/10 border-teal-200"
+  teal: "from-teal-500/10 to-teal-600/10 border-teal-200",
+  orange: "from-orange-500/10 to-orange-600/10 border-orange-200",
+  indigo: "from-indigo-500/10 to-indigo-600/10 border-indigo-200",
+  rose: "from-rose-500/10 to-rose-600/10 border-rose-200"
 };
 
 const badgeColorMap = {
@@ -30,7 +33,10 @@ const badgeColorMap = {
   red: "bg-red-100 text-red-800 hover:bg-red-200",
   blue: "bg-blue-100 text-blue-800 hover:bg-blue-200",
   purple: "bg-purple-100 text-purple-800 hover:bg-purple-200",
-  teal: "bg-teal-100 text-teal-800 hover:bg-teal-200"
+  teal: "bg-teal-100 text-teal-800 hover:bg-teal-200",
+  orange: "bg-orange-100 text-orange-800 hover:bg-orange-200",
+  indigo: "bg-indigo-100 text-indigo-800 hover:bg-indigo-200",
+  rose: "bg-rose-100 text-rose-800 hover:bg-rose-200"
 };
 
 export const CriterionCard = ({

@@ -18,7 +18,7 @@ const CRITERIA_ENDPOINTS = [
 ];
 
 const Index = () => {
-  const [currentSection, setCurrentSection] = useState<"metrics" | "search" | "global">("metrics");
+  const [currentSection, setCurrentSection] = useState<"metrics" | "search" | "global" | "about">("metrics");
   const [loading, setLoading] = useState(false);
   const [initializing, setInitializing] = useState(false);
   const [error, setError] = useState<string | null>(null);

@@ -72,14 +72,14 @@ export const SearchAgentSection = () => {
   };
 
   return (
-    <div className="fixed inset-0 flex flex-col bg-white">
-      {/* Header */}
+    <div className="flex flex-col w-full h-full bg-white/30 backdrop-blur-md rounded-3xl overflow-hidden shadow-xl shadow-gray-500/10">
+      {/* Header interno del chat */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex-shrink-0 border-b border-gray-200 bg-white px-6 py-4"
+        className="flex-shrink-0 border-b border-white/20 bg-white/40 backdrop-blur-sm px-6 py-4"
       >
-        <div className="flex items-center justify-between max-w-4xl mx-auto">
+        <div className="flex items-center justify-between max-w-6xl mx-auto">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
               <Sparkles className="w-6 h-6 text-white" />
@@ -96,9 +96,9 @@ export const SearchAgentSection = () => {
         </div>
       </motion.div>
 
-      {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto bg-gray-50">
-        <div className="max-w-4xl mx-auto px-6 py-6 space-y-6">
+      {/* Messages Area - Con scroll mejorado */}
+      <div className="flex-1 overflow-y-auto bg-gradient-to-b from-white/20 to-white/10">
+        <div className="max-w-6xl mx-auto px-6 py-6 space-y-6">
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center text-center px-4 py-20">
               <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-4">
@@ -115,7 +115,7 @@ export const SearchAgentSection = () => {
                   <button
                     key={idx}
                     onClick={() => handleSuggestionClick(suggestion)}
-                    className="text-left px-4 py-3 bg-white hover:bg-gray-50 rounded-xl text-sm text-gray-700 transition-all duration-200 border border-gray-200 hover:border-blue-300"
+                    className="text-left px-4 py-3 bg-white hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-50 rounded-2xl text-sm text-gray-700 transition-all duration-200 border border-gray-200 hover:border-blue-300 shadow-sm hover:shadow-md"
                   >
                     {suggestion}
                   </button>
@@ -138,10 +138,10 @@ export const SearchAgentSection = () => {
                     </div>
                   )}
                   <div
-                    className={`max-w-[75%] rounded-2xl px-5 py-4 ${
+                    className={`max-w-[75%] rounded-3xl px-5 py-4 transition-all duration-200 ${
                       message.role === "user"
-                        ? "bg-blue-600 text-white"
-                        : "bg-white text-gray-900 shadow-sm border border-gray-200"
+                        ? "bg-blue-600 text-white shadow-md shadow-blue-500/20"
+                        : "bg-white text-gray-900 shadow-md shadow-gray-500/10 border border-gray-100"
                     }`}
                   >
                     {message.role === "assistant" ? (
@@ -188,21 +188,21 @@ export const SearchAgentSection = () => {
       </div>
 
       {/* Input Area */}
-      <div className="flex-shrink-0 border-t border-gray-200 bg-white">
-        <div className="max-w-4xl mx-auto px-6 py-4">
+      <div className="flex-shrink-0 border-t border-white/20 bg-white/40 backdrop-blur-sm">
+        <div className="max-w-6xl mx-auto px-6 py-4">
           <div className="flex gap-3">
             <Input
               placeholder="Escribe tu mensaje..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-              className="flex-1 h-14 border-gray-300 bg-white focus:ring-2 focus:ring-blue-500 rounded-xl text-gray-900 placeholder:text-gray-500 shadow-sm text-base px-4"
+              className="flex-1 h-14 border-gray-300 bg-white focus:ring-2 focus:ring-blue-500 rounded-2xl text-gray-900 placeholder:text-gray-500 shadow-sm text-base px-4 transition-all duration-200"
               disabled={isLoading}
             />
             <button
               onClick={handleSearch}
               disabled={isLoading || !query.trim()}
-              className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white px-5 rounded-xl transition-colors duration-200 disabled:cursor-not-allowed flex items-center justify-center shadow-sm"
+              className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white px-6 rounded-2xl transition-all duration-200 disabled:cursor-not-allowed flex items-center justify-center shadow-md hover:shadow-lg hover:shadow-blue-500/20 disabled:shadow-none"
             >
               {isLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
