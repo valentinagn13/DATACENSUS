@@ -42,7 +42,7 @@ const fetchAIAnalysis = async (metricsText: string): Promise<string> => {
   }
 
   const data = await response.json();
-  return data.output || "";
+  return Array.isArray(data) && data[0]?.output ? data[0].output : "";
 };
 
 const markdownToPlainText = (markdown: string): string => {
@@ -90,8 +90,37 @@ export const generatePDFReport = async (results: QualityResults): Promise<void> 
   });
   pdf.text(`Generado: ${date}`, pageWidth / 2, 37, { align: "center" });
   
-  // AI Analysis Section
+  // Metrics Section
   let yPosition = 55;
+  pdf.setTextColor(0, 0, 0);
+  pdf.setFontSize(16);
+  pdf.text("Puntuación General", margin, yPosition);
+  
+  yPosition += 10;
+  pdf.setFontSize(32);
+  pdf.setTextColor(37, 99, 235);
+  pdf.text(`${results.promedioGeneral.toFixed(1)}/10`, margin, yPosition);
+  
+  yPosition += 15;
+  pdf.setFontSize(14);
+  pdf.setTextColor(0, 0, 0);
+  pdf.text("Métricas Individuales", margin, yPosition);
+  
+  yPosition += 10;
+  pdf.setFontSize(10);
+  pdf.setTextColor(60, 60, 60);
+  const metricsLines = metricsText.split('\n');
+  metricsLines.forEach((line: string) => {
+    if (yPosition > pageHeight - 20) {
+      pdf.addPage();
+      yPosition = 20;
+    }
+    pdf.text(line, margin, yPosition);
+    yPosition += 6;
+  });
+  
+  // AI Analysis Section
+  yPosition += 10;
   pdf.setTextColor(0, 0, 0);
   pdf.setFontSize(16);
   pdf.text("Análisis de Calidad", margin, yPosition);
