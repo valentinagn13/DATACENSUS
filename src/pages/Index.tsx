@@ -17,7 +17,7 @@ const Index = () => {
     checkServerStatus().then(isActive => {
       if (!isActive) {
         toast.error("Servidor no disponible", {
-          description: "El servidor backend no está disponible. Por favor, verifica que esté ejecutándose en http://localhost:8001"
+          description: "El servidor backend no está disponible. Por favor, verifica que esté ejecutándose en http://3.148.102.253:8001"
         });
       }
     });

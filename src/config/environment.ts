@@ -4,7 +4,7 @@
  */
 
 // API Configuration
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8001";
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://3.148.102.253:8001";
 export const AI_AGENT_WEBHOOK = import.meta.env.VITE_AI_AGENT_WEBHOOK || "https://uzuma.duckdns.org/webhook/agent-calification";
 export const AI_AGENT_SEARCH_WEBHOOK = import.meta.env.VITE_AI_AGENT_SEARCH_WEBHOOK || "https://uzuma.duckdns.org/webhook/agent";
 

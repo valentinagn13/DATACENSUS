@@ -22,8 +22,8 @@ cp .env.example .env
 
 #### Backend API Configuration
 - **`VITE_API_BASE_URL`**: URL del servidor backend
-  - Valor por defecto: `http://localhost:8001`
-  - Ejemplo: `VITE_API_BASE_URL=http://localhost:8001`
+  - Valor por defecto: `http://3.148.102.253:8001`
+  - Ejemplo: `VITE_API_BASE_URL=http://3.148.102.253:8001`
   - Para producción: `VITE_API_BASE_URL=https://api.ejemplo.com`
 
 #### AI Agent Configuration
@@ -77,7 +77,7 @@ cp .env.example .env
 El archivo `src/config/environment.ts` centraliza el acceso a todas las variables de entorno:
 
 ```typescript
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8001";
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://3.148.102.253:8001";
 export const AI_AGENT_WEBHOOK = import.meta.env.VITE_AI_AGENT_WEBHOOK || "...";
 // etc.
 ```

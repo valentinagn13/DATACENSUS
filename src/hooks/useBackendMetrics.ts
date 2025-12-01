@@ -12,7 +12,7 @@ import type {
 // In production (or when VITE_API_BASE_URL is set), use that value or fallback to the ngrok URL.
 const API_BASE_URL = import.meta.env.DEV
   ? ""
-  : (import.meta.env.VITE_API_BASE_URL || "http://localhost:8000");
+  : (import.meta.env.VITE_API_BASE_URL || "http://3.148.102.253:8000");
 
 async function fetchMetric<T>(endpoint: string): Promise<T> {
   console.log(`Fetching from: ${API_BASE_URL}${endpoint}`);

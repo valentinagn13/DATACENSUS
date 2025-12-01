@@ -5,7 +5,7 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
-  const API_PROXY_TARGET = process.env.VITE_API_BASE_URL || (mode === 'development' ? 'http://localhost:8000' : "https://46f839ef0f6c.ngrok-free.app");
+  const API_PROXY_TARGET = process.env.VITE_API_BASE_URL || (mode === 'development' ? 'http://3.148.102.253:8000' : "https://46f839ef0f6c.ngrok-free.app");
   return {
     server: {
       host: "::",

@@ -10,7 +10,7 @@ import { Header } from "@/components/Header/Header";
 import { SearchAgentSection } from "@/components/SearchAgent/SearchAgentSection";
 import { GlobalMetricsSection } from "@/components/Metrics/GlobalMetricsSection";
 
-const API_BASE_URL = "http://localhost:8001";
+const API_BASE_URL = "http://3.148.102.253:8001";
 
 const CRITERIA_ENDPOINTS = [
   "actualidad",
@@ -172,7 +172,7 @@ const Index = () => {
   useEffect(() => {
     checkServerStatus().then(isActive => {
       if (!isActive) {
-        setError("El servidor backend no está disponible. Por favor, verifica que esté ejecutándose en http://localhost:8001");
+        setError("El servidor backend no está disponible. Por favor, verifica que esté ejecutándose en http://3.148.102.253:8001");
         toast.error("Servidor no disponible");
       }
     });
