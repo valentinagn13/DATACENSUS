@@ -28,7 +28,7 @@ export const MetricsDisplay = ({
       toast.info("Generando reporte PDF...", {
         description: "El agente está analizando las métricas"
       });
-      await generatePDFReport(results);
+      await generatePDFReport(results, datasetName, datasetId);
       toast.success("PDF generado exitosamente", {
         description: "El reporte se ha descargado"
       });

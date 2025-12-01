@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
 import { QualityResults } from "@/types/dataQuality";
 
-const formatMetricsForAgent = (results: QualityResults): string => {
+const formatMetricsForAgent = (results: QualityResults, datasetName?: string, datasetId?: string): string => {
   const criteria = [
     { key: "confidencialidad", label: "Confidencialidad" },
     { key: "actualidad", label: "Actualidad" },
@@ -23,7 +23,13 @@ const formatMetricsForAgent = (results: QualityResults): string => {
     })
     .join('\n');
 
-  return `Puntuación General: ${results.promedioGeneral.toFixed(1)}/10\n\nMétricas individuales:\n${metricsText}`;
+  let message = `Puntuación General: ${results.promedioGeneral.toFixed(1)}/10\n\nMétricas individuales:\n${metricsText}`;
+  
+  if (datasetName || datasetId) {
+    message = `Dataset: ${datasetName || 'N/A'} (ID: ${datasetId || 'N/A'})\n\n${message}`;
+  }
+
+  return message;
 };
 
 const fetchAIAnalysis = async (metricsText: string): Promise<string> => {
@@ -57,8 +63,12 @@ const markdownToPlainText = (markdown: string): string => {
     .trim();
 };
 
-export const generatePDFReport = async (results: QualityResults): Promise<void> => {
-  const metricsText = formatMetricsForAgent(results);
+export const generatePDFReport = async (
+  results: QualityResults,
+  datasetName?: string,
+  datasetId?: string
+): Promise<void> => {
+  const metricsText = formatMetricsForAgent(results, datasetName, datasetId);
   const aiAnalysisMarkdown = await fetchAIAnalysis(metricsText);
   const aiAnalysis = markdownToPlainText(aiAnalysisMarkdown);
 
@@ -68,19 +78,42 @@ export const generatePDFReport = async (results: QualityResults): Promise<void> 
   const margin = 20;
   const maxWidth = pageWidth - (margin * 2);
   
-  // Header
-  pdf.setFillColor(37, 99, 235);
-  pdf.rect(0, 0, pageWidth, 40, "F");
+  // Define colors
+  const primaryColor = [37, 99, 235] as const;
+  const accentColor = [59, 130, 246] as const;
+  const textDark = [20, 25, 40] as const;
+  const textMedium = [80, 90, 120] as const;
+  const textLight = [140, 150, 180] as const;
+  const bgLight = [242, 246, 255] as const;
   
+  // Header - Enhanced design
+  pdf.setFillColor(...primaryColor);
+  pdf.rect(0, 0, pageWidth, 50, "F");
+  
+  // Header accent line
+  pdf.setFillColor(...accentColor);
+  pdf.rect(0, 48, pageWidth, 2, "F");
+  
+  // Logo/Title
   pdf.setTextColor(255, 255, 255);
-  pdf.setFontSize(24);
-  pdf.text("DataCensus", pageWidth / 2, 20, { align: "center" });
+  pdf.setFontSize(28);
+  pdf.setFont("helvetica", "bold");
+  pdf.text("DataCensus", margin, 20);
   
   pdf.setFontSize(12);
-  pdf.text("Reporte de Calidad de Datos", pageWidth / 2, 30, { align: "center" });
+  pdf.setFont("helvetica", "normal");
+  pdf.text("Reporte de Evaluación de Calidad de Datos", margin, 28);
+  
+  // Dataset info in header
+  if (datasetName || datasetId) {
+    pdf.setFontSize(9);
+    pdf.setFont("helvetica", "normal");
+    const datasetInfo = `Dataset: ${datasetName || 'N/A'} | ID: ${datasetId || 'N/A'}`;
+    pdf.text(datasetInfo, margin, 35);
+  }
   
   // Date
-  pdf.setFontSize(10);
+  pdf.setFontSize(9);
   const date = new Date().toLocaleDateString("es-ES", {
     year: "numeric",
     month: "long",
@@ -88,72 +121,123 @@ export const generatePDFReport = async (results: QualityResults): Promise<void> 
     hour: "2-digit",
     minute: "2-digit"
   });
-  pdf.text(`Generado: ${date}`, pageWidth / 2, 37, { align: "center" });
+  pdf.text(`Generado: ${date}`, pageWidth - margin, 35, { align: "right" });
+  
+  // Main content starts
+  let yPosition = 60;
+  
+  // Score Section - Prominent
+  pdf.setFillColor(...bgLight);
+  pdf.rect(margin - 5, yPosition - 5, maxWidth + 10, 40, "F");
+  pdf.setDrawColor(...primaryColor);
+  pdf.setLineWidth(2);
+  pdf.rect(margin - 5, yPosition - 5, maxWidth + 10, 40);
+  
+  pdf.setTextColor(...textDark);
+  pdf.setFontSize(12);
+  pdf.setFont("helvetica", "bold");
+  pdf.text("Puntuación General de Calidad", margin, yPosition + 3);
+  
+  pdf.setFontSize(36);
+  pdf.setTextColor(...primaryColor);
+  pdf.setFont("helvetica", "bold");
+  pdf.text(`${results.promedioGeneral.toFixed(1)}`, margin + maxWidth / 2 - 10, yPosition + 25, { align: "center" });
+  
+  pdf.setFontSize(12);
+  pdf.setTextColor(...textMedium);
+  pdf.setFont("helvetica", "normal");
+  pdf.text("de 10.0", margin + maxWidth / 2 + 10, yPosition + 25, { align: "left" });
+  
+  yPosition += 50;
   
   // Metrics Section
-  let yPosition = 55;
-  pdf.setTextColor(0, 0, 0);
-  pdf.setFontSize(16);
-  pdf.text("Puntuación General", margin, yPosition);
-  
-  yPosition += 10;
-  pdf.setFontSize(32);
-  pdf.setTextColor(37, 99, 235);
-  pdf.text(`${results.promedioGeneral.toFixed(1)}/10`, margin, yPosition);
-  
-  yPosition += 15;
+  pdf.setTextColor(...textDark);
   pdf.setFontSize(14);
-  pdf.setTextColor(0, 0, 0);
-  pdf.text("Métricas Individuales", margin, yPosition);
+  pdf.setFont("helvetica", "bold");
+  pdf.text("Métricas de Evaluación", margin, yPosition);
   
   yPosition += 10;
+  
+  // Metrics background
+  pdf.setFillColor(...bgLight);
+  const metricsLines = metricsText.split('\n').filter(line => line.includes(':'));
+  const metricsHeight = metricsLines.length * 6 + 10;
+  pdf.rect(margin - 5, yPosition - 5, maxWidth + 10, metricsHeight, "F");
+  pdf.setDrawColor(...accentColor);
+  pdf.setLineWidth(1);
+  pdf.rect(margin - 5, yPosition - 5, maxWidth + 10, metricsHeight);
+  
   pdf.setFontSize(10);
-  pdf.setTextColor(60, 60, 60);
-  const metricsLines = metricsText.split('\n');
+  pdf.setTextColor(...textMedium);
+  pdf.setFont("helvetica", "normal");
+  
   metricsLines.forEach((line: string) => {
-    if (yPosition > pageHeight - 20) {
+    if (yPosition > pageHeight - 40) {
       pdf.addPage();
       yPosition = 20;
     }
-    pdf.text(line, margin, yPosition);
+    pdf.text(line, margin + 5, yPosition);
     yPosition += 6;
   });
+  
+  yPosition += 8;
   
   // AI Analysis Section
-  yPosition += 10;
-  pdf.setTextColor(0, 0, 0);
-  pdf.setFontSize(16);
-  pdf.text("Análisis de Calidad", margin, yPosition);
+  pdf.setTextColor(...textDark);
+  pdf.setFontSize(14);
+  pdf.setFont("helvetica", "bold");
+  pdf.text("Análisis Inteligente", margin, yPosition);
   
-  yPosition += 10;
-  pdf.setFontSize(10);
-  pdf.setTextColor(60, 60, 60);
+  yPosition += 8;
   
-  const lines = pdf.splitTextToSize(aiAnalysis, maxWidth);
+  pdf.setFontSize(9);
+  pdf.setTextColor(...textMedium);
+  pdf.setFont("helvetica", "normal");
+  
+  const lines = pdf.splitTextToSize(aiAnalysis, maxWidth - 5);
   
   lines.forEach((line: string) => {
-    if (yPosition > pageHeight - 20) {
+    if (yPosition > pageHeight - 25) {
       pdf.addPage();
       yPosition = 20;
     }
-    pdf.text(line, margin, yPosition);
-    yPosition += 6;
+    pdf.text(line, margin + 2, yPosition);
+    yPosition += 5;
   });
   
-  // Footer
-  pdf.setTextColor(128, 128, 128);
+  // Footer on all pages
+  pdf.setTextColor(...textLight);
   pdf.setFontSize(8);
+  pdf.setFont("helvetica", "normal");
   const finalPage = (pdf as any).internal.getNumberOfPages();
   for (let i = 1; i <= finalPage; i++) {
     pdf.setPage(i);
+    
+    // Footer separator line
+    pdf.setDrawColor(...accentColor);
+    pdf.setLineWidth(0.5);
+    pdf.line(margin, pageHeight - 12, pageWidth - margin, pageHeight - 12);
+    
+    // Footer text
     pdf.text(
-      "DataCensus • Análisis de Calidad de Datos basado en ISO/IEC 25012",
+      "DataCensus • Evaluación de Calidad de Datos basado en ISO/IEC 25012",
       pageWidth / 2,
-      pageHeight - 10,
+      pageHeight - 8,
       { align: "center" }
+    );
+    
+    // Page number
+    pdf.text(
+      `Página ${i} de ${finalPage}`,
+      pageWidth - margin,
+      pageHeight - 8,
+      { align: "right" }
     );
   }
   
   // Save PDF
-  pdf.save(`datacensus-report-${Date.now()}.pdf`);
+  const filename = datasetName
+    ? `datacensus-${datasetName.replace(/\s+/g, '-')}-${Date.now()}.pdf`
+    : `datacensus-report-${Date.now()}.pdf`;
+  pdf.save(filename);
 };

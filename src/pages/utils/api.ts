@@ -1,6 +1,6 @@
 // Utilities for API calls and shared constants
 
-export const API_BASE_URL = "https://astrid-innominate-catharine.ngrok-free.dev";
+export const API_BASE_URL = "http://localhost:8001";
 
 export const CRITERIA_ENDPOINTS = [
   "actualidad",
