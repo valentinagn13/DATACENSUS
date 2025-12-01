@@ -1,11 +1,72 @@
 import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
 import { QualityResults } from "@/types/dataQuality";
 
+const formatMetricsForAgent = (results: QualityResults): string => {
+  const criteria = [
+    { key: "confidencialidad", label: "Confidencialidad" },
+    { key: "actualidad", label: "Actualidad" },
+    { key: "conformidad", label: "Conformidad" },
+    { key: "unicidad", label: "Unicidad" },
+    { key: "accesibilidad", label: "Accesibilidad" },
+    { key: "portabilidad", label: "Portabilidad" },
+    { key: "disponibilidad", label: "Disponibilidad" },
+    { key: "trazabilidad", label: "Trazabilidad" },
+    { key: "credibilidad", label: "Credibilidad" },
+    { key: "recuperabilidad", label: "Recuperabilidad" },
+    { key: "completitud", label: "Completitud" }
+  ];
+
+  const metricsText = criteria
+    .map(({ key, label }) => {
+      const value = results[key as keyof QualityResults];
+      return `${label}: ${typeof value === 'number' ? value.toFixed(1) : 'N/A'}`;
+    })
+    .join('\n');
+
+  return `Puntuación General: ${results.promedioGeneral.toFixed(1)}/10\n\nMétricas individuales:\n${metricsText}`;
+};
+
+const fetchAIAnalysis = async (metricsText: string): Promise<string> => {
+  const response = await fetch("https://uzuma.duckdns.org/webhook/agent-calification", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      userMessage: metricsText
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Error al obtener análisis del agente");
+  }
+
+  const data = await response.json();
+  return data.output || "";
+};
+
+const markdownToPlainText = (markdown: string): string => {
+  return markdown
+    .replace(/#{1,6}\s+/g, '')
+    .replace(/\*\*(.+?)\*\*/g, '$1')
+    .replace(/\*(.+?)\*/g, '$1')
+    .replace(/\[(.+?)\]\(.+?\)/g, '$1')
+    .replace(/`(.+?)`/g, '$1')
+    .replace(/^[-*+]\s+/gm, '• ')
+    .replace(/^\d+\.\s+/gm, '')
+    .trim();
+};
+
 export const generatePDFReport = async (results: QualityResults): Promise<void> => {
+  const metricsText = formatMetricsForAgent(results);
+  const aiAnalysisMarkdown = await fetchAIAnalysis(metricsText);
+  const aiAnalysis = markdownToPlainText(aiAnalysisMarkdown);
+
   const pdf = new jsPDF("p", "mm", "a4");
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
+  const margin = 20;
+  const maxWidth = pageWidth - (margin * 2);
   
   // Header
   pdf.setFillColor(37, 99, 235);
@@ -29,98 +90,40 @@ export const generatePDFReport = async (results: QualityResults): Promise<void> 
   });
   pdf.text(`Generado: ${date}`, pageWidth / 2, 37, { align: "center" });
   
-  // Overall Score Section
+  // AI Analysis Section
+  let yPosition = 55;
   pdf.setTextColor(0, 0, 0);
   pdf.setFontSize(16);
-  pdf.text("Calificación General", 20, 55);
+  pdf.text("Análisis de Calidad", margin, yPosition);
   
-  pdf.setFontSize(32);
-  const overallScore = results.promedioGeneral.toFixed(1);
-  pdf.text(`${overallScore}/10`, pageWidth / 2, 70, { align: "center" });
-  
-  const scoreColor = results.promedioGeneral >= 7 ? [34, 197, 94] : 
-                      results.promedioGeneral >= 5 ? [234, 179, 8] : [239, 68, 68];
-  pdf.setTextColor(scoreColor[0], scoreColor[1], scoreColor[2]);
-  pdf.setFontSize(12);
-  const classification = results.promedioGeneral >= 7 ? "Excelente" :
-                        results.promedioGeneral >= 5 ? "Aceptable" : "Deficiente";
-  pdf.text(classification, pageWidth / 2, 80, { align: "center" });
-  
-  // Criteria Details
-  pdf.setTextColor(0, 0, 0);
-  pdf.setFontSize(16);
-  pdf.text("Métricas Individuales", 20, 95);
-  
-  const criteria = [
-    { key: "confidencialidad", label: "Confidencialidad" },
-    { key: "relevancia", label: "Relevancia" },
-    { key: "actualidad", label: "Actualidad" },
-    { key: "trazabilidad", label: "Trazabilidad" },
-    { key: "conformidad", label: "Conformidad" },
-    { key: "exactitudSintactica", label: "Exactitud Sintáctica" },
-    { key: "exactitudSemantica", label: "Exactitud Semántica" },
-    { key: "completitud", label: "Completitud" },
-    { key: "consistencia", label: "Consistencia" },
-    { key: "precision", label: "Precisión" },
-    { key: "portabilidad", label: "Portabilidad" },
-    { key: "credibilidad", label: "Credibilidad" },
-    { key: "comprensibilidad", label: "Comprensibilidad" },
-    { key: "accesibilidad", label: "Accesibilidad" },
-    { key: "unicidad", label: "Unicidad" },
-    { key: "eficiencia", label: "Eficiencia" },
-    { key: "recuperabilidad", label: "Recuperabilidad" },
-    { key: "disponibilidad", label: "Disponibilidad" }
-  ];
-  
-  let yPosition = 105;
+  yPosition += 10;
   pdf.setFontSize(10);
+  pdf.setTextColor(60, 60, 60);
   
-  criteria.forEach((criterion, index) => {
-    if (yPosition > pageHeight - 30) {
+  const lines = pdf.splitTextToSize(aiAnalysis, maxWidth);
+  
+  lines.forEach((line: string) => {
+    if (yPosition > pageHeight - 20) {
       pdf.addPage();
       yPosition = 20;
     }
-    
-    const value = results[criterion.key as keyof QualityResults] as number;
-    const displayValue = value.toFixed(1);
-    
-    // Criterion name
-    pdf.setTextColor(0, 0, 0);
-    pdf.text(criterion.label, 20, yPosition);
-    
-    // Score bar
-    const barWidth = 80;
-    const barHeight = 4;
-    const barX = pageWidth - barWidth - 40;
-    const barY = yPosition - 3;
-    
-    // Background bar
-    pdf.setFillColor(229, 231, 235);
-    pdf.rect(barX, barY, barWidth, barHeight, "F");
-    
-    // Filled bar
-    const fillWidth = (value / 10) * barWidth;
-    const fillColor = value >= 7 ? [34, 197, 94] : 
-                      value >= 5 ? [234, 179, 8] : [239, 68, 68];
-    pdf.setFillColor(fillColor[0], fillColor[1], fillColor[2]);
-    pdf.rect(barX, barY, fillWidth, barHeight, "F");
-    
-    // Score text
-    pdf.setTextColor(fillColor[0], fillColor[1], fillColor[2]);
-    pdf.text(displayValue, pageWidth - 25, yPosition);
-    
-    yPosition += 10;
+    pdf.text(line, margin, yPosition);
+    yPosition += 6;
   });
   
   // Footer
   pdf.setTextColor(128, 128, 128);
   pdf.setFontSize(8);
-  pdf.text(
-    "DataCensus • Análisis de Calidad de Datos basado en ISO/IEC 25012",
-    pageWidth / 2,
-    pageHeight - 10,
-    { align: "center" }
-  );
+  const finalPage = (pdf as any).internal.getNumberOfPages();
+  for (let i = 1; i <= finalPage; i++) {
+    pdf.setPage(i);
+    pdf.text(
+      "DataCensus • Análisis de Calidad de Datos basado en ISO/IEC 25012",
+      pageWidth / 2,
+      pageHeight - 10,
+      { align: "center" }
+    );
+  }
   
   // Save PDF
   pdf.save(`datacensus-report-${Date.now()}.pdf`);

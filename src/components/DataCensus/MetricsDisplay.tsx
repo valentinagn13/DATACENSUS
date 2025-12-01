@@ -1,8 +1,12 @@
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { QualityResults } from "@/types/dataQuality";
 import { CriterionCard } from "./CriterionCard";
-import { TrendingUp, AlertCircle } from "lucide-react";
+import { TrendingUp, AlertCircle, Download, Loader2 } from "lucide-react";
+import { generatePDFReport } from "@/lib/quality/exportPDF";
+import { toast } from "sonner";
+import { useState } from "react";
 
 interface MetricsDisplayProps {
   results: QualityResults;
@@ -16,6 +20,26 @@ export const MetricsDisplay = ({
   datasetId,
 }: MetricsDisplayProps) => {
   console.log("Results en MetricsDisplay:", results);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+
+  const handleDownloadPDF = async () => {
+    setIsGeneratingPDF(true);
+    try {
+      toast.info("Generando reporte PDF...", {
+        description: "El agente está analizando las métricas"
+      });
+      await generatePDFReport(results);
+      toast.success("PDF generado exitosamente", {
+        description: "El reporte se ha descargado"
+      });
+    } catch (error) {
+      toast.error("Error al generar PDF", {
+        description: error instanceof Error ? error.message : "Intenta de nuevo"
+      });
+    } finally {
+      setIsGeneratingPDF(false);
+    }
+  };
 
   const getScoreColor = (score: number) => {
     if (score >= 8) return "from-green-500 to-green-600";
@@ -91,6 +115,23 @@ export const MetricsDisplay = ({
                 <p className="text-lg font-semibold text-gray-700 mt-2">
                   {getScoreLabel(results.promedioGeneral ?? 0)}
                 </p>
+                <Button
+                  onClick={handleDownloadPDF}
+                  disabled={isGeneratingPDF}
+                  className="mt-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white"
+                >
+                  {isGeneratingPDF ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Generando PDF...
+                    </>
+                  ) : (
+                    <>
+                      <Download className="w-4 h-4 mr-2" />
+                      Descargar Reporte PDF
+                    </>
+                  )}
+                </Button>
               </div>
 
               {/* Score Indicator */}
