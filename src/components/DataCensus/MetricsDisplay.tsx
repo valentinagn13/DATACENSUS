@@ -7,6 +7,7 @@ import { TrendingUp, AlertCircle, Download, Loader2 } from "lucide-react";
 import { generatePDFReport } from "@/lib/quality/exportPDF";
 import { toast } from "sonner";
 import { useState } from "react";
+import { DATOS_GOV_CO_DATASET_PATH } from "@/config/environment";
 
 interface MetricsDisplayProps {
   results: QualityResults;
@@ -76,7 +77,7 @@ export const MetricsDisplay = ({
             )}
             {datasetId && (
               <a
-                                href={`https://www.datos.gov.co/d/${datasetId}`}
+                                href={`${DATOS_GOV_CO_DATASET_PATH}/${datasetId}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-4 py-2 bg-[#2962FF]/10 hover:bg-[#2962FF]/20 text-[#2962FF] font-medium rounded-lg transition-colors"
@@ -243,46 +244,6 @@ export const MetricsDisplay = ({
             tooltipContent="Evalúa si los datos son accesibles, recuperables y están correctamente documentados para su uso"
             color="blue"
             delay={0.35}
-          />
-
-          {/* Portabilidad */}
-          <CriterionCard
-            title="Portabilidad"
-            value={results.portabilidad}
-            description="Facilidad para trasladar y reutilizar datos entre sistemas"
-            tooltipContent="Evalúa si los datos y formatos permiten transferencia y uso entre diferentes entornos"
-            color="purple"
-            delay={0.37}
-          />
-
-          {/* Disponibilidad */}
-          <CriterionCard
-            title="Disponibilidad"
-            value={results.disponibilidad}
-            description="Accesibilidad temporal y garantía de disponibilidad del servicio"
-            tooltipContent="Evalúa el tiempo de disponibilidad del dataset y garantía de acceso sin interrupciones"
-            color="teal"
-            delay={0.39}
-          />
-
-          {/* Trazabilidad */}
-          <CriterionCard
-            title="Trazabilidad"
-            value={results.trazabilidad}
-            description="Capacidad de rastrear el origen y cambios de los datos"
-            tooltipContent="Evalúa la capacidad de auditar y rastrear el origen, transformaciones y cambios de los datos en el tiempo"
-            color="orange"
-            delay={0.41}
-          />
-
-          {/* Credibilidad */}
-          <CriterionCard
-            title="Credibilidad"
-            value={results.credibilidad}
-            description="Confiabilidad y autoridad de la fuente de datos"
-            tooltipContent="Evalúa la credibilidad de la fuente, reputación del publicador y confiabilidad de los datos proporcionados"
-            color="indigo"
-            delay={0.43}
           />
 
           {/* Recuperabilidad */}

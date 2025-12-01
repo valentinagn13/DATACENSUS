@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { GITHUB_FRONTEND_REPO, GITHUB_BACKEND_REPO } from "@/config/environment";
 
 export const AboutSection = () => {
   return (
@@ -48,7 +49,7 @@ export const AboutSection = () => {
             <h3 className="text-lg font-semibold text-white mb-2">Frontend</h3>
             <p className="text-cyan-100 text-sm mb-4">Interfaz web de DataCensus</p>
               <a
-                href="https://github.com/valentinagn13/DATACENSUS"
+                href={GITHUB_FRONTEND_REPO}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors duration-200"
@@ -67,7 +68,7 @@ export const AboutSection = () => {
             <h3 className="text-lg font-semibold text-white mb-2">Backend</h3>
             <p className="text-cyan-100 text-sm mb-4">Motor de cálculo de métricas</p>
               <a
-                href="https://github.com/valentinagn13/Mini_backend_metricas"
+                href={GITHUB_BACKEND_REPO}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors duration-200"

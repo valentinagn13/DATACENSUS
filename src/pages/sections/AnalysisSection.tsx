@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { AlertCircle, Loader2, CheckCircle2, Database, Search, Sparkles } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent } from "@/components/ui/card";
-import { API_BASE_URL } from "../utils/api";
+import { API_BASE_URL, DEFAULT_DATASET_ID, DATOS_GOV_CO_BASE_URL } from "@/config/environment";
 
 interface AnalysisSectionProps {
   onSearchClick: () => void;
@@ -26,7 +26,7 @@ export const AnalysisSection = ({ onSearchClick }: AnalysisSectionProps) => {
     total_records_available?: number;
     limit_reached?: boolean;
   }>({});
-  const [datasetInput, setDatasetInput] = useState("8dbv-wsjq");
+  const [datasetInput, setDatasetInput] = useState(DEFAULT_DATASET_ID);
   const [analysisStarted, setAnalysisStarted] = useState(false);
   const [isLoadingCompletitud, setIsLoadingCompletitud] = useState(false);
 
@@ -277,12 +277,12 @@ export const AnalysisSection = ({ onSearchClick }: AnalysisSectionProps) => {
         >
           <div className="w-2 h-2 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full animate-pulse"></div>
           <a 
-            href="https://datos.gov.co" 
+            href={DATOS_GOV_CO_BASE_URL} 
             target="_blank" 
             rel="noopener noreferrer"
             className="text-sm font-medium text-black bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent hover:underline"
           >
-            Encuentra datasets en datos.gov.co
+            Encuentra datasets en {DATOS_GOV_CO_BASE_URL}
           </a>
         </motion.div>
       </div>

@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from 'remark-gfm'
 import remarkBreaks from 'remark-breaks'
+import { AI_AGENT_SEARCH_WEBHOOK } from "@/config/environment";
 
 interface Message {
   role: "user" | "assistant";
@@ -52,7 +53,7 @@ export const SearchAgentSection = () => {
     setIsLoading(true);
 
     try {
-      const res = await fetch("https://uzuma.duckdns.org/webhook/agent", {
+      const res = await fetch(AI_AGENT_SEARCH_WEBHOOK, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

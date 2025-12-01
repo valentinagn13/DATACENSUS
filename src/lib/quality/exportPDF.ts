@@ -1,5 +1,6 @@
 import jsPDF from "jspdf";
 import { QualityResults } from "@/types/dataQuality";
+import { AI_AGENT_WEBHOOK } from "@/config/environment";
 
 const formatMetricsForAgent = (results: QualityResults, datasetName?: string, datasetId?: string): string => {
   const criteria = [
@@ -33,7 +34,7 @@ const formatMetricsForAgent = (results: QualityResults, datasetName?: string, da
 };
 
 const fetchAIAnalysis = async (metricsText: string): Promise<string> => {
-  const response = await fetch("https://uzuma.duckdns.org/webhook/agent-calification", {
+  const response = await fetch(AI_AGENT_WEBHOOK, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -78,42 +79,50 @@ export const generatePDFReport = async (
   const margin = 20;
   const maxWidth = pageWidth - (margin * 2);
   
-  // Define colors
-  const primaryColor = [37, 99, 235] as const;
-  const accentColor = [59, 130, 246] as const;
+  // Define colors - Cyan/Blue palette (matching header)
+  const primaryColor = [6, 182, 212] as const; // cyan-500
+  const accentColor = [37, 99, 235] as const; // blue-600
   const textDark = [20, 25, 40] as const;
   const textMedium = [80, 90, 120] as const;
   const textLight = [140, 150, 180] as const;
-  const bgLight = [242, 246, 255] as const;
+  const bgLight = [240, 249, 255] as const; // cyan-50
   
-  // Header - Enhanced design
+  // Header - Enhanced design with gradient effect
   pdf.setFillColor(...primaryColor);
-  pdf.rect(0, 0, pageWidth, 50, "F");
+  pdf.rect(0, 0, pageWidth, 55, "F");
   
   // Header accent line
   pdf.setFillColor(...accentColor);
-  pdf.rect(0, 48, pageWidth, 2, "F");
+  pdf.rect(0, 53, pageWidth, 2.5, "F");
   
   // Logo/Title
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(28);
   pdf.setFont("helvetica", "bold");
-  pdf.text("DataCensus", margin, 20);
+  pdf.text("DataCensus", margin, 18);
   
   pdf.setFontSize(12);
   pdf.setFont("helvetica", "normal");
-  pdf.text("Reporte de Evaluación de Calidad de Datos", margin, 28);
+  pdf.text("Reporte de Evaluación de Calidad de Datos", margin, 26);
   
-  // Dataset info in header
+  // Dataset info in header - PROMINENT
   if (datasetName || datasetId) {
-    pdf.setFontSize(9);
-    pdf.setFont("helvetica", "normal");
-    const datasetInfo = `Dataset: ${datasetName || 'N/A'} | ID: ${datasetId || 'N/A'}`;
-    pdf.text(datasetInfo, margin, 35);
+    pdf.setFontSize(11);
+    pdf.setFont("helvetica", "bold");
+    pdf.setTextColor(255, 255, 255);
+    const datasetDisplay = datasetName ? `${datasetName}` : `Dataset ID: ${datasetId}`;
+    pdf.text(datasetDisplay, margin, 35);
+    
+    if (datasetId) {
+      pdf.setFontSize(8);
+      pdf.setFont("helvetica", "normal");
+      pdf.text(`ID: ${datasetId}`, margin, 42);
+    }
   }
   
   // Date
-  pdf.setFontSize(9);
+  pdf.setFontSize(8);
+  pdf.setTextColor(255, 255, 255);
   const date = new Date().toLocaleDateString("es-ES", {
     year: "numeric",
     month: "long",
@@ -121,34 +130,34 @@ export const generatePDFReport = async (
     hour: "2-digit",
     minute: "2-digit"
   });
-  pdf.text(`Generado: ${date}`, pageWidth - margin, 35, { align: "right" });
+  pdf.text(`Generado: ${date}`, pageWidth - margin, 40, { align: "right" });
   
   // Main content starts
-  let yPosition = 60;
+  let yPosition = 65;
   
-  // Score Section - Prominent
+  // Score Section - Prominent with cyan accent
   pdf.setFillColor(...bgLight);
-  pdf.rect(margin - 5, yPosition - 5, maxWidth + 10, 40, "F");
+  pdf.rect(margin - 5, yPosition - 5, maxWidth + 10, 45, "F");
   pdf.setDrawColor(...primaryColor);
-  pdf.setLineWidth(2);
-  pdf.rect(margin - 5, yPosition - 5, maxWidth + 10, 40);
+  pdf.setLineWidth(2.5);
+  pdf.rect(margin - 5, yPosition - 5, maxWidth + 10, 45);
   
   pdf.setTextColor(...textDark);
   pdf.setFontSize(12);
   pdf.setFont("helvetica", "bold");
   pdf.text("Puntuación General de Calidad", margin, yPosition + 3);
   
-  pdf.setFontSize(36);
+  pdf.setFontSize(40);
   pdf.setTextColor(...primaryColor);
   pdf.setFont("helvetica", "bold");
-  pdf.text(`${results.promedioGeneral.toFixed(1)}`, margin + maxWidth / 2 - 10, yPosition + 25, { align: "center" });
+  pdf.text(`${results.promedioGeneral.toFixed(1)}`, margin + maxWidth / 2, yPosition + 25, { align: "center" });
   
-  pdf.setFontSize(12);
+  pdf.setFontSize(14);
   pdf.setTextColor(...textMedium);
   pdf.setFont("helvetica", "normal");
-  pdf.text("de 10.0", margin + maxWidth / 2 + 10, yPosition + 25, { align: "left" });
+  pdf.text("/10", margin + maxWidth / 2 + 15, yPosition + 25, { align: "left" });
   
-  yPosition += 50;
+  yPosition += 55;
   
   // Metrics Section
   pdf.setTextColor(...textDark);
